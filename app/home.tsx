@@ -1,118 +1,166 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {
+  View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Image,} from 'react-native';
+import { FontAwesome5, MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
+
+type Aba = 'profile' | 'home' | 'chart';
+
+const logotipo = require('../assets/images/logotipo.png');
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const [active, setActive] = useState<Aba>('home');
+
+  const scaleValues: Record<Aba, Animated.Value> = {
+    profile: useState(new Animated.Value(1))[0],
+    home: useState(new Animated.Value(1))[0],
+    chart: useState(new Animated.Value(1))[0],
+  };
+
+  const handlePress = (key: Aba) => {
+    Object.keys(scaleValues).forEach((k) => {
+      Animated.timing(scaleValues[k as Aba], {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    Animated.timing(scaleValues[key], {
+      toValue: 1.4,
+      duration: 150,
+      useNativeDriver: true,
+    }).start();
+
+    setActive(key);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="#8A1B58" />
-      </TouchableOpacity>
+      {/* Cabeçalho */}
+      <View style={styles.header}>
+        <FontAwesome5 name="user-circle" size={28} color="#fff" />
+        {/* IMAGEM NO LUGAR DO NOME */}
+        <Image source={logotipo} style={styles.logoImage} resizeMode="contain" />
+        <Feather name="menu" size={28} color="#fff" />
+      </View>
 
-      {/* Conteúdo com rolagem */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>lucienemodas26</Text>
-        <Text style={styles.lyrics}>
-          Numa folha qualquer eu desenho um sol amarelo{"\n"}
-          E com cinco ou seis retas é fácil fazer um castelo{"\n"}
-          Corro o lápis em torno da mão e me dou uma luva{"\n"}
-          E se faço chover, com dois riscos tenho um guarda-chuva{"\n\n"}
+      {/* Funcionalidades */}
+      <Text style={styles.sectionTitle}>Funcionalidades</Text>
+      <View style={styles.featureContainer}>
+        <View style={styles.featureItem}>
+          <MaterialIcons name="analytics" size={28} color="#8A1B58" />
+          <Text style={styles.featureText}>Painel</Text>
+        </View>
+        <View style={styles.featureItem}>
+          <MaterialIcons name="playlist-add" size={28} color="#8A1B58" />
+          <Text style={styles.featureText}>Adicionar</Text>
+        </View>
+        <View style={styles.featureItem}>
+          <MaterialIcons name="inventory" size={28} color="#8A1B58" />
+          <Text style={styles.featureText}>Pedidos</Text>
+        </View>
+      </View>
 
-          Se um pinguinho de tinta cai num pedacinho azul do papel{"\n"}
-          Num instante imagino uma linda gaivota a voar no céu{"\n"}
-          Vai voando, contornando a imensa curva{"\n"}
-          Norte e sul, vou com ela{"\n"}
-          Viajando Havaí, Pequim ou Istambul{"\n"}
-          Pinto um barco a vela, branco navegando{"\n"}
-          É tanto céu e mar num beijo azul{"\n\n"}
-
-          Entre as nuvens vem surgindo um lindo avião{"\n"}
-          Rosa e grená{"\n"}
-          Tudo em volta colorindo{"\n"}
-          Com suas luzes a piscar{"\n"}
-          Basta imaginar e ele está partindo{"\n"}
-          Sereno e lindo{"\n"}
-          E se a gente quiser{"\n"}
-          Ele vai pousar...
-           Numa folha qualquer eu desenho um sol amarelo{"\n"}
-          E com cinco ou seis retas é fácil fazer um castelo{"\n"}
-          Corro o lápis em torno da mão e me dou uma luva{"\n"}
-          E se faço chover, com dois riscos tenho um guarda-chuva{"\n\n"}
-
-          Se um pinguinho de tinta cai num pedacinho azul do papel{"\n"}
-          Num instante imagino uma linda gaivota a voar no céu{"\n"}
-          Vai voando, contornando a imensa curva{"\n"}
-          Norte e sul, vou com ela{"\n"}
-          Viajando Havaí, Pequim ou Istambul{"\n"}
-          Pinto um barco a vela, branco navegando{"\n"}
-          É tanto céu e mar num beijo azul{"\n\n"}
-
-          Entre as nuvens vem surgindo um lindo avião{"\n"}
-          Rosa e grená{"\n"}
-          Tudo em volta colorindo{"\n"}
-          Com suas luzes a piscar{"\n"}
-          Basta imaginar e ele está partindo{"\n"}
-          Sereno e lindo{"\n"}
-          E se a gente quiser{"\n"}
-          Ele vai pousar...
-           Numa folha qualquer eu desenho um sol amarelo{"\n"}
-          E com cinco ou seis retas é fácil fazer um castelo{"\n"}
-          Corro o lápis em torno da mão e me dou uma luva{"\n"}
-          E se faço chover, com dois riscos tenho um guarda-chuva{"\n\n"}
-
-          Se um pinguinho de tinta cai num pedacinho azul do papel{"\n"}
-          Num instante imagino uma linda gaivota a voar no céu{"\n"}
-          Vai voando, contornando a imensa curva{"\n"}
-          Norte e sul, vou com ela{"\n"}
-          Viajando Havaí, Pequim ou Istambul{"\n"}
-          Pinto um barco a vela, branco navegando{"\n"}
-          É tanto céu e mar num beijo azul{"\n\n"}
-
-          Entre as nuvens vem surgindo um lindo avião{"\n"}
-          Rosa e grená{"\n"}
-          Tudo em volta colorindo{"\n"}
-          Com suas luzes a piscar{"\n"}
-          Basta imaginar e ele está partindo{"\n"}
-          Sereno e lindo{"\n"}
-          E se a gente quiser{"\n"}
-          Ele vai pousar...
-        </Text>
+      {/* Produtos */}
+      <Text style={styles.sectionTitle}>Produtos</Text>
+      <ScrollView contentContainerStyle={styles.productGrid}>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <View style={styles.productCard} key={i}>
+            <Ionicons name="shirt-outline" size={32} color="#555" />
+            <Text style={styles.productText}>Produto R$XX,XX</Text>
+          </View>
+        ))}
       </ScrollView>
+
+      {/* Rodapé com botões animados */}
+      <View style={styles.footer}>
+        {[
+          { key: 'profile', icon: <FontAwesome5 name="user" size={24} color="#8A1B58" /> },
+          { key: 'home', icon: <Ionicons name="home" size={24} color="#8A1B58" /> },
+          { key: 'chart', icon: <MaterialIcons name="bar-chart" size={24} color="#8A1B58" /> },
+        ].map(({ key, icon }) => (
+          <TouchableOpacity key={key} onPress={() => handlePress(key as Aba)} activeOpacity={0.8}>
+            <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleValues[key as Aba] }] }]}>
+              {icon}
+            </Animated.View>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 60,
-    paddingHorizontal: 20,
+  container: { flex: 1, backgroundColor: '#fff', paddingTop: 40 },
+  header: {
+    backgroundColor: '#8A1B58',
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
+  logoImage: {
+    width: 300,
+    height: 30,
   },
-  scrollContent: {
-    paddingTop: 40,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginLeft: 20,
+    color: '#8A1B58',
+  },
+  featureContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 15,
+    paddingHorizontal: 10,
+  },
+  featureItem: {
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    padding: 10,
+    borderRadius: 10,
+    width: 90,
+  },
+  featureText: {
+    fontSize: 12,
+    marginTop: 5,
+    textAlign: 'center',
+    color: '#8A1B58',
+  },
+  productGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    padding: 10,
     paddingBottom: 80,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#8A1B58',
+  productCard: {
+    width: '30%',
+    alignItems: 'center',
+    marginVertical: 10,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 10,
+  },
+  productText: {
+    fontSize: 12,
+    marginTop: 5,
     textAlign: 'center',
   },
-  lyrics: {
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 26
+  footer: {
+    backgroundColor: '#8A1B58',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+  },
+  footerIcon: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 30,
   },
 });
