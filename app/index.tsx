@@ -1,18 +1,17 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 
-export default function App() {
+export default function LoginScreen() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      {/* Logo como texto */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>LUCIENE MODAS</Text>
+      {/* Círculo grande no topo */}
+      <View style={styles.topCircle}>
+        <Text style={styles.welcomeText}></Text>
       </View>
 
-      {/* Tela de boas-vindas */}
-      <Text style={styles.welcomeText}>Bem vinda, Luciene!</Text>
-
-      {/* Formulário de Login */}
       <View style={styles.formContainer}>
         <TextInput
           style={styles.input}
@@ -34,7 +33,10 @@ export default function App() {
           <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => router.push('/home')}
+        >
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -46,51 +48,59 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
-    justifyContent: 'center',
     alignItems: 'center',
   },
-  logoContainer: {
+  topCircle: {
+    width: 300,
+    height: 300,
+    borderRadius: 155,
+    backgroundColor: '#8A1B58',
+    marginTop: 80,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    marginBottom: 50,
-  },
-  logoText: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#8A1B58',
-    letterSpacing: 2, 
+    paddingBottom: 40,
   },
   welcomeText: {
-    fontSize: 18,
-    color: '#8A1B58',
-    marginBottom: 20,
+    fontSize: 24,
+    color: '#E2B24D',
+    fontWeight: 'bold',
+    transform: [{ rotate: '-15deg' }],
   },
   formContainer: {
+    backgroundColor: '#8A1B58',
     width: '100%',
+    flex: 1,
+    borderTopLeftRadius: 90, // curvatura do retangulo
+    borderTopRightRadius: 90, // curvatura do retangulo
+    paddingTop: 65, // altura da caixa de texto
+    paddingHorizontal: 50,
+    marginTop: 65, // margem entre circulo e retangulo
   },
   input: {
-    backgroundColor: '#F1F1F1',
-    borderRadius: 5,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     padding: 15,
-    marginBottom: 10,
-    width: '100%',
+    marginBottom: 20,
+    fontSize: 16,
   },
   forgotPassword: {
-    marginBottom: 20,
     alignItems: 'center',
+    marginBottom: 30,
   },
   forgotPasswordText: {
-    fontSize: 14,
-    color: '#FF9800',
+    color: '#E2B24D',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   loginButton: {
-    backgroundColor: '#8A1B58',
+    backgroundColor: '#E2B24D',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 18,
+    color: '#8A1B58',
   },
 });
