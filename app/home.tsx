@@ -1,50 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView, Image,} from 'react-native';
-import { FontAwesome5, MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
+  View, Text, StyleSheet, ScrollView, SafeAreaView,
+  Image
+} from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 
-type Aba = 'profile' | 'home' | 'chart';
-
-const logotipo = require('../assets/images/logotipo.png');
+import Header from '../components/header';
+import Footer from '../components/footer';
 
 export default function HomeScreen() {
-  const [active, setActive] = useState<Aba>('home');
-
-  const scaleValues: Record<Aba, Animated.Value> = {
-    profile: useState(new Animated.Value(1))[0],
-    home: useState(new Animated.Value(1))[0],
-    chart: useState(new Animated.Value(1))[0],
-  };
-
-  const handlePress = (key: Aba) => {
-    Object.keys(scaleValues).forEach((k) => {
-      Animated.timing(scaleValues[k as Aba], {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    });
-
-    Animated.timing(scaleValues[key], {
-      toValue: 1.4,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-
-    setActive(key);
-  };
-
   return (
-    <View style={styles.container}>
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-        <FontAwesome5 name="user-circle" size={28} color="#fff" />
-        {/* IMAGEM NO LUGAR DO NOME */}
-        <Image source={logotipo} style={styles.logoImage} resizeMode="contain" />
-        <Feather name="menu" size={28} color="#fff" />
-      </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header />
 
-      {/* Funcionalidades */}
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
       <View style={styles.featureContainer}>
         <View style={styles.featureItem}>
@@ -61,7 +29,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Produtos */}
       <Text style={styles.sectionTitle}>Produtos</Text>
       <ScrollView contentContainerStyle={styles.productGrid}>
         {Array.from({ length: 9 }).map((_, i) => (
@@ -72,37 +39,12 @@ export default function HomeScreen() {
         ))}
       </ScrollView>
 
-      {/* Rodapé com botões animados */}
-      <View style={styles.footer}>
-        {[
-          { key: 'profile', icon: <FontAwesome5 name="user" size={24} color="#8A1B58" /> },
-          { key: 'home', icon: <Ionicons name="home" size={24} color="#8A1B58" /> },
-          { key: 'chart', icon: <MaterialIcons name="bar-chart" size={24} color="#8A1B58" /> },
-        ].map(({ key, icon }) => (
-          <TouchableOpacity key={key} onPress={() => handlePress(key as Aba)} activeOpacity={0.8}>
-            <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleValues[key as Aba] }] }]}>
-              {icon}
-            </Animated.View>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
+      <Footer />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 40 },
-  header: {
-    backgroundColor: '#8A1B58',
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: 300,
-    height: 30,
-  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -148,19 +90,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
     textAlign: 'center',
-  },
-  footer: {
-    backgroundColor: '#8A1B58',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-  footerIcon: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 30,
   },
 });
