@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import Header from '../components/header';
 import Footer from '../components/footer';
 
-export default function AnaliseScreen() {
+export default function PedidosScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
       <View style={styles.container}>
-        <Text style={styles.title}>capacete</Text>
+        <Text style={styles.title}>Luciene pitel</Text>
       </View>
       <Footer />
     </SafeAreaView>

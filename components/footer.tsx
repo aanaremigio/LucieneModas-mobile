@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet } from 'react-native';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
@@ -9,54 +9,65 @@ export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const initialTab = (): Aba => {
-    if (pathname === '/perfil') return 'profile';
-    if (pathname === '/analise') return 'chart';
-    return 'home';
+  // Define os valores animados
+  const scaleProfile = new Animated.Value(1);
+  const scaleHome = new Animated.Value(1);
+  const scaleChart = new Animated.Value(1);
+
+  // Função para resetar todas as escalas
+  const resetAll = () => {
+    Animated.parallel([
+      Animated.timing(scaleProfile, { toValue: 1, duration: 150, useNativeDriver: true }),
+      Animated.timing(scaleHome, { toValue: 1, duration: 150, useNativeDriver: true }),
+      Animated.timing(scaleChart, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
   };
 
-  const [active, setActive] = useState<Aba>(initialTab());
-
-  const scaleValues: Record<Aba, Animated.Value> = {
-    profile: useState(new Animated.Value(1))[0],
-    home: useState(new Animated.Value(1))[0],
-    chart: useState(new Animated.Value(1))[0],
+  // Anima o botão ativo baseado na rota atual
+  const animateActive = (tab: Aba) => {
+    resetAll();
+    Animated.timing(
+      tab === 'profile' ? scaleProfile :
+      tab === 'chart' ? scaleChart :
+      scaleHome,
+      { toValue: 1.4, duration: 150, useNativeDriver: true }
+    ).start();
   };
 
-  const handlePress = (key: Aba) => {
-    Object.keys(scaleValues).forEach((k) => {
-      Animated.timing(scaleValues[k as Aba], {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    });
+  // Detecta a aba atual pela rota e anima ao entrar
+  useEffect(() => {
+    if (pathname === '/perfil') animateActive('profile');
+    else if (pathname === '/analise') animateActive('chart');
+    else animateActive('home');
+  }, [pathname]);
 
-    Animated.timing(scaleValues[key], {
-      toValue: 1.4,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-
-    setActive(key);
-
-    if (key === 'profile') router.push('/perfil');
-    else if (key === 'chart') router.push('/analise');
+  // Ação ao clicar
+  const handlePress = (tab: Aba) => {
+    animateActive(tab);
+    if (tab === 'profile') router.push('/perfil');
+    else if (tab === 'chart') router.push('/analise');
     else router.push('/home');
   };
 
   return (
     <View style={styles.footer}>
-      {[{ key: 'profile', icon: <FontAwesome5 name="user" size={24} color="#8A1B58" /> },
-        { key: 'home', icon: <Ionicons name="home" size={24} color="#8A1B58" /> },
-        { key: 'chart', icon: <MaterialIcons name="bar-chart" size={24} color="#8A1B58" /> },
-      ].map(({ key, icon }) => (
-        <TouchableOpacity key={key} onPress={() => handlePress(key as Aba)} activeOpacity={0.8}>
-          <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleValues[key as Aba] }] }]}>
-            {icon}
-          </Animated.View>
-        </TouchableOpacity>
-      ))}
+      <TouchableOpacity onPress={() => handlePress('profile')} activeOpacity={0.8}>
+        <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleProfile }] }]}>
+          <FontAwesome5 name="user" size={24} color="#8A1B58" />
+        </Animated.View>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handlePress('home')} activeOpacity={0.8}>
+        <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleHome }] }]}>
+          <Ionicons name="home" size={24} color="#8A1B58" />
+        </Animated.View>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handlePress('chart')} activeOpacity={0.8}>
+        <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleChart }] }]}>
+          <MaterialIcons name="bar-chart" size={24} color="#8A1B58" />
+        </Animated.View>
+      </TouchableOpacity>
     </View>
   );
 }

@@ -10,10 +10,17 @@ export default function Header() {
 
   return (
     <View style={styles.header}>
-      <FontAwesome5 name="user-circle" size={28} color="#fff" />
+      {/* Ícone de perfil que leva para a página /perfil */}
+      <TouchableOpacity onPress={() => router.push('/perfil')}>
+        <FontAwesome5 name="user-circle" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Logotipo central (vai para /home ou /) */}
       <TouchableOpacity onPress={() => router.replace('/')}>
         <Image source={logotipo} style={styles.logoImage} resizeMode="contain" />
       </TouchableOpacity>
+
+      {/* Ícone de menu (não configurado ainda) */}
       <Feather name="menu" size={28} color="#fff" />
     </View>
   );

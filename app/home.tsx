@@ -1,32 +1,34 @@
 import React from 'react';
-import {
-  View, Text, StyleSheet, ScrollView, SafeAreaView,
-  Image
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 import Header from '../components/header';
 import Footer from '../components/footer';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
 
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
       <View style={styles.featureContainer}>
-        <View style={styles.featureItem}>
+        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/analise')}>
           <MaterialIcons name="analytics" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Painel</Text>
-        </View>
-        <View style={styles.featureItem}>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/adicionar')}>
           <MaterialIcons name="playlist-add" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Adicionar</Text>
-        </View>
-        <View style={styles.featureItem}>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/pedidos')}>
           <MaterialIcons name="inventory" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Pedidos</Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.sectionTitle}>Produtos</Text>
