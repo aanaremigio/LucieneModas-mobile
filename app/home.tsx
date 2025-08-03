@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-
 import Header from '../components/header';
 import Footer from '../components/footer';
 
@@ -11,6 +10,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+  
       <Header />
 
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
