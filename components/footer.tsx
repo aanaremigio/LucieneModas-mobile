@@ -1,20 +1,20 @@
-import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Animated, StyleSheet } from 'react-native';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter, usePathname } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Aba = 'profile' | 'home' | 'chart';
 
 export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets(); 
 
-  // Define os valores animados
   const scaleProfile = new Animated.Value(1);
   const scaleHome = new Animated.Value(1);
   const scaleChart = new Animated.Value(1);
 
-  // Função para resetar todas as escalas
   const resetAll = () => {
     Animated.parallel([
       Animated.timing(scaleProfile, { toValue: 1, duration: 150, useNativeDriver: true }),
@@ -23,7 +23,7 @@ export default function Footer() {
     ]).start();
   };
 
-  // Anima o botão ativo baseado na rota atual
+
   const animateActive = (tab: Aba) => {
     resetAll();
     Animated.timing(
@@ -34,14 +34,12 @@ export default function Footer() {
     ).start();
   };
 
-  // Detecta a aba atual pela rota e anima ao entrar
   useEffect(() => {
     if (pathname === '/perfil') animateActive('profile');
     else if (pathname === '/analise') animateActive('chart');
     else animateActive('home');
   }, [pathname]);
 
-  // Ação ao clicar
   const handlePress = (tab: Aba) => {
     animateActive(tab);
     if (tab === 'profile') router.push('/perfil');
@@ -50,7 +48,7 @@ export default function Footer() {
   };
 
   return (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { paddingBottom: insets.bottom || 10 }]}>
       <TouchableOpacity onPress={() => handlePress('profile')} activeOpacity={0.8}>
         <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleProfile }] }]}>
           <FontAwesome5 name="user" size={24} color="#8A1B58" />
@@ -79,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingVertical: 10,
     position: 'absolute',
-    bottom: 2,
+    bottom: 0, // Sempre grudado no final da tela
     left: 0,
     right: 0,
     zIndex: 100,

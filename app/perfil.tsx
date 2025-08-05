@@ -21,7 +21,7 @@ export default function PerfilScreen() {
   const [email, setEmail] = useState('luciene26@gmail.com');
   const [password, setPassword] = useState('12345678');
   const [telefone, setTelefone] = useState('(83) 9 9546-6783');
-  const [showPassword, setShowPassword] = useState(false); // 👁️ Controle do olhinho
+  const [showPassword, setShowPassword] = useState(false); //  Controle do olhinho
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
