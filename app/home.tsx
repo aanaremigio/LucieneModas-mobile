@@ -10,9 +10,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-  
       <Header />
 
+      {/* Seção Funcionalidades */}
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
       <View style={styles.featureContainer}>
         <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/analise')}>
@@ -29,8 +29,15 @@ export default function HomeScreen() {
           <MaterialIcons name="inventory" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Pedidos</Text>
         </TouchableOpacity>
+
+        {/* Novo botão REMOVER */}
+        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/remover')}>
+          <MaterialIcons name="delete" size={28} color="#8A1B58" />
+          <Text style={styles.featureText}>Remover</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* Seção Produtos */}
       <Text style={styles.sectionTitle}>Produtos</Text>
       <ScrollView contentContainerStyle={styles.productGrid}>
         {Array.from({ length: 9 }).map((_, i) => (
@@ -56,6 +63,7 @@ const styles = StyleSheet.create({
   },
   featureContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap', // Permite quebrar linha se necessário
     justifyContent: 'space-around',
     marginTop: 15,
     paddingHorizontal: 10,
@@ -66,6 +74,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     width: 90,
+    marginVertical: 5, // Dá espaçamento entre linhas
   },
   featureText: {
     fontSize: 12,

@@ -1,8 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Dimensions,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface MenuProps {
   isOpen: boolean;
@@ -36,7 +44,6 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
         <View style={styles.grayBackground} />
       </TouchableWithoutFeedback>
 
-      {/* Menu lateral */}
       <Animated.View
         style={[
           styles.menu,
@@ -45,7 +52,6 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
       >
         <Text style={styles.title}>Home</Text>
 
-        {/* Funcionalidades */}
         <TouchableOpacity onPress={() => setShowFuncionalidades(prev => !prev)}>
           <Text style={styles.subtitle}>↓ Funcionalidades</Text>
         </TouchableOpacity>
@@ -55,18 +61,18 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
             <TouchableOpacity onPress={() => navigate('/analise')}>
               <Text style={styles.link}>Painel de Análise</Text>
             </TouchableOpacity>
-
             <TouchableOpacity onPress={() => navigate('/adicionar')}>
-              <Text style={styles.link}>Adicionar/Remover</Text>
+              <Text style={styles.link}>Adicionar Produto</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity onPress={() => navigate('/remover')}>
+              <Text style={styles.link}>Remover Produto</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => navigate('/pedidos')}>
               <Text style={styles.link}>Pedidos</Text>
             </TouchableOpacity>
           </>
         )}
 
-        {/* Categorias */}
         <TouchableOpacity onPress={() => setShowCategorias(prev => !prev)}>
           <Text style={styles.subtitle}>↓ Categorias</Text>
         </TouchableOpacity>
@@ -92,7 +98,7 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 9999, 
+    zIndex: 9999,
   },
   grayBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -102,15 +108,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 50,
-    bottom: 0,
+    bottom: 103.2,
     width: width * 0.6,
     backgroundColor: '#8A1B58',
     paddingHorizontal: 20,
-    paddingTop: 80,
+    paddingTop: 100,
     zIndex: 10000,
   },
   title: {
-    color: '#ffffffff',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 35,
     marginBottom: 25,
@@ -122,14 +128,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   link: {
-    color: '#ffffffff',
+    color: '#fff',
     fontSize: 17,
     marginVertical: 5,
   },
   exitButton: {
     position: 'absolute',
-    bottom: 65,
-    right: 25,
+    bottom: 20,
+    right: 20,
     borderColor: '#FFD700',
     borderWidth: 3,
     paddingVertical: 5,
