@@ -28,13 +28,13 @@ export default function AdicionarScreen() {
           <TextInput
             placeholder="R$"
             placeholderTextColor="#000000ff"
-            style={[styles.input, { flex: 1, marginRight: 5 }]}
+            style={styles.inputHalf}
             keyboardType="numeric" />
             
           <TextInput
           placeholder="Estoque"
           placeholderTextColor="#000000ff"
-          style={[styles.input, { flex: 1, marginLeft: 5 }]}
+          style={styles.inputHalf}
           keyboardType="numeric" />
         </View>
 
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
   imageBox: {
     height: 120,
-    backgroundColor: '#efddbb',
+    backgroundColor: '#EFDDBB',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   input: {
-    backgroundColor: '#efddbb',
+    backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
@@ -112,9 +112,18 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '90%',
+    maxWidth: 400,
+    marginBottom: 10,
+  },
+  inputHalf: {
+    backgroundColor: '#EFDDBB',
+    borderRadius: 8,
+    padding: 10,
+    width: '48%',
   },
   textArea: {
-    backgroundColor: '#efddbb',
+    backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
     height: 100,
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   categoriaBtn: {
-    backgroundColor: '#efddbb',
+    backgroundColor: '#EFDDBB',
     padding: 10,
     borderRadius: 8,
     marginVertical: 3,
@@ -140,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8A1B58',
   },
   categoriaText: {
-    color: '#000000ff', // preto padrão
+    color: '#000000ff', // preto como cor padrão
     textAlign: 'center',
   },
   salvarBtn: {
