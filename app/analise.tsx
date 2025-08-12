@@ -8,7 +8,7 @@ export default function AnaliseScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
       <View style={styles.container}>
-        <Text style={styles.title}>capacete</Text>
+        <Text style={styles.title}>painel de analise</Text>
       </View>
       <Footer />
     </SafeAreaView>

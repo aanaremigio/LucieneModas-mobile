@@ -8,7 +8,7 @@ export default function PedidosScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
       <View style={styles.container}>
-        <Text style={styles.title}>Luciene pitel</Text>
+        <Text style={styles.title}>pedidos</Text>
       </View>
       <Footer />
     </SafeAreaView>
