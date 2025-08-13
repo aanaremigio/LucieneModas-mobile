@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Header from '../components/header';
 import Footer from '../components/footer';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -13,35 +15,34 @@ export default function HomeScreen() {
       <Header />
 
       {/* Seção Funcionalidades */}
-      <Text style={styles.sectionTitle}>Funcionalidades</Text>
-      <View style={styles.featureContainer}>
-        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/analise')}>
+      <Text style={[styles.sectionTitle, { fontSize: width > 400 ? 18 : 16 }]}>Funcionalidades</Text>
+      <View style={[styles.featureContainer, { flexDirection: width > 400 ? 'row' : 'column' }]}>
+        <TouchableOpacity style={[styles.featureItem, { width: width > 400 ? 90 : '100%' }]} onPress={() => router.push('/analise')}>
           <MaterialIcons name="analytics" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Painel</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/adicionar')}>
+        <TouchableOpacity style={[styles.featureItem, { width: width > 400 ? 90 : '100%' }]} onPress={() => router.push('/adicionar')}>
           <MaterialIcons name="playlist-add" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Adicionar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/pedidos')}>
+        <TouchableOpacity style={[styles.featureItem, { width: width > 400 ? 90 : '100%' }]} onPress={() => router.push('/pedidos')}>
           <MaterialIcons name="inventory" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Pedidos</Text>
         </TouchableOpacity>
 
-        {/* Novo botão REMOVER */}
-        <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/remover')}>
+        <TouchableOpacity style={[styles.featureItem, { width: width > 400 ? 90 : '100%' }]} onPress={() => router.push('/remover')}>
           <MaterialIcons name="delete" size={28} color="#8A1B58" />
           <Text style={styles.featureText}>Remover</Text>
         </TouchableOpacity>
       </View>
 
       {/* Seção Produtos */}
-      <Text style={styles.sectionTitle}>Produtos</Text>
+      <Text style={[styles.sectionTitle, { fontSize: width > 400 ? 18 : 16 }]}>Produtos</Text>
       <ScrollView contentContainerStyle={styles.productGrid}>
         {Array.from({ length: 9 }).map((_, i) => (
-          <View style={styles.productCard} key={i}>
+          <View style={[styles.productCard, { width: width > 400 ? '30%' : '45%' }]} key={i}>
             <Ionicons name="shirt-outline" size={32} color="#555" />
             <Text style={styles.productText}>Produto R$XX,XX</Text>
           </View>
@@ -55,15 +56,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
     marginLeft: 20,
     color: '#8A1B58',
   },
   featureContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap', // Permite quebrar linha se necessário
     justifyContent: 'space-around',
     marginTop: 15,
     paddingHorizontal: 10,
@@ -73,8 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     padding: 10,
     borderRadius: 10,
-    width: 90,
-    marginVertical: 5, // Dá espaçamento entre linhas
+    marginVertical: 5,
   },
   featureText: {
     fontSize: 12,
@@ -90,7 +87,6 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   productCard: {
-    width: '30%',
     alignItems: 'center',
     marginVertical: 10,
     backgroundColor: '#f0f0f0',

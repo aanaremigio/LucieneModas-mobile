@@ -1,15 +1,18 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Aba = 'profile' | 'home' | 'chart';
 
+// Obter as dimensões da janela
+const { width } = Dimensions.get('window');
+
 export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
-  const insets = useSafeAreaInsets(); 
+  const insets = useSafeAreaInsets();
 
   const scaleProfile = new Animated.Value(1);
   const scaleHome = new Animated.Value(1);
@@ -22,7 +25,6 @@ export default function Footer() {
       Animated.timing(scaleChart, { toValue: 1, duration: 150, useNativeDriver: true }),
     ]).start();
   };
-
 
   const animateActive = (tab: Aba) => {
     resetAll();
@@ -48,7 +50,7 @@ export default function Footer() {
   };
 
   return (
-    <View style={[styles.footer, { paddingBottom: insets.bottom || 10 }]}>
+    <View style={[styles.footer, { paddingBottom: insets.bottom || 10, flexDirection: width > 400 ? 'row' : 'column' }]}>
       <TouchableOpacity onPress={() => handlePress('profile')} activeOpacity={0.8}>
         <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleProfile }] }]}>
           <FontAwesome5 name="user" size={24} color="#8A1B58" />
@@ -73,18 +75,20 @@ export default function Footer() {
 const styles = StyleSheet.create({
   footer: {
     backgroundColor: '#8A1B58',
-    flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
     position: 'absolute',
-    bottom: 0, // Sempre grudado no final da tela
+    bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
+    width: '100%',
+    alignItems: 'center',
   },
   footerIcon: {
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 30,
+    margin: 5,
   },
 });
