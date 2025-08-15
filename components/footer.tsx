@@ -1,22 +1,24 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scale, verticalScale, moderateScale } from '../coisasuteis/scale';
+
 
 type Aba = 'profile' | 'home' | 'chart';
 
-// Obter as dimensões da janela
-const { width } = Dimensions.get('window');
 
 export default function Footer() {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
+
   const scaleProfile = new Animated.Value(1);
   const scaleHome = new Animated.Value(1);
   const scaleChart = new Animated.Value(1);
+
 
   const resetAll = () => {
     Animated.parallel([
@@ -25,6 +27,7 @@ export default function Footer() {
       Animated.timing(scaleChart, { toValue: 1, duration: 150, useNativeDriver: true }),
     ]).start();
   };
+
 
   const animateActive = (tab: Aba) => {
     resetAll();
@@ -36,11 +39,13 @@ export default function Footer() {
     ).start();
   };
 
+
   useEffect(() => {
     if (pathname === '/perfil') animateActive('profile');
     else if (pathname === '/analise') animateActive('chart');
     else animateActive('home');
   }, [pathname]);
+
 
   const handlePress = (tab: Aba) => {
     animateActive(tab);
@@ -49,34 +54,38 @@ export default function Footer() {
     else router.push('/home');
   };
 
+
   return (
-    <View style={[styles.footer, { paddingBottom: insets.bottom || 10, flexDirection: width > 400 ? 'row' : 'column' }]}>
+    <View style={[styles.footer, { paddingBottom: insets.bottom || verticalScale(10) }]}>
       <TouchableOpacity onPress={() => handlePress('profile')} activeOpacity={0.8}>
         <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleProfile }] }]}>
-          <FontAwesome5 name="user" size={24} color="#8A1B58" />
+          <FontAwesome5 name="user" size={moderateScale(24)} color="#8A1B58" />
         </Animated.View>
       </TouchableOpacity>
+
 
       <TouchableOpacity onPress={() => handlePress('home')} activeOpacity={0.8}>
         <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleHome }] }]}>
-          <Ionicons name="home" size={24} color="#8A1B58" />
+          <Ionicons name="home" size={moderateScale(24)} color="#8A1B58" />
         </Animated.View>
       </TouchableOpacity>
 
+
       <TouchableOpacity onPress={() => handlePress('chart')} activeOpacity={0.8}>
         <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleChart }] }]}>
-          <MaterialIcons name="bar-chart" size={24} color="#8A1B58" />
+          <MaterialIcons name="bar-chart" size={moderateScale(24)} color="#8A1B58" />
         </Animated.View>
       </TouchableOpacity>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   footer: {
     backgroundColor: '#8A1B58',
     justifyContent: 'space-around',
-    paddingVertical: 10,
+    paddingVertical: verticalScale(10),
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -84,11 +93,12 @@ const styles = StyleSheet.create({
     zIndex: 100,
     width: '100%',
     alignItems: 'center',
+    flexDirection: 'row',
   },
   footerIcon: {
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 30,
-    margin: 5,
+    padding: moderateScale(10),
+    borderRadius: moderateScale(30),
+    margin: scale(5),
   },
 });
