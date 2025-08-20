@@ -5,9 +5,11 @@ import { useRouter } from 'expo-router';
 import Header from '../components/header';
 import Footer from '../components/footer';
 import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
+import ProdutosList from '@/components/produtosList';
 
 
 export default function HomeScreen() {
+  
   const router = useRouter();
 
 
@@ -43,18 +45,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-
-      {/* Seção Produtos */}
-      <Text style={styles.sectionTitle}>Produtos</Text>
-      <ScrollView contentContainerStyle={styles.productGrid}>
-        {Array.from({ length: 9 }).map((_, i) => (
-          <View style={styles.productCard} key={i}>
-            <Ionicons name="shirt-outline" size={moderateScale(32)} color="#555" />
-            <Text style={styles.productText}>Produto R$XX,XX</Text>
-          </View>
-        ))}
-      </ScrollView>
-
+      <ProdutosList />
 
       <Footer />
     </SafeAreaView>
