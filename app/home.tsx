@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { MaterialIcons} from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Header from '../components/header';
 import Footer from '../components/footer';
@@ -9,7 +9,7 @@ import ProdutosList from '@/components/produtosList';
 
 
 export default function HomeScreen() {
-  
+ 
   const router = useRouter();
 
 
