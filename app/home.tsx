@@ -17,8 +17,6 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
 
-
-      {/* Seção Funcionalidades */}
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
       <View style={styles.featureContainer}>
         <TouchableOpacity style={styles.featureItem} onPress={() => router.push('/analise')}>
@@ -81,21 +79,6 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(5),
     textAlign: 'center',
     color: '#8A1B58',
-  },
-  productGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: scale(10),
-    paddingBottom: verticalScale(80),
-  },
-  productCard: {
-    alignItems: 'center',
-    marginVertical: verticalScale(10),
-    backgroundColor: '#f0f0f0',
-    padding: moderateScale(10),
-    borderRadius: moderateScale(10),
-    width: '45%',
   },
   productText: {
     fontSize: fontScale(12),

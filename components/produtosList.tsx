@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
 
 export default function ProdutosList() {
@@ -11,7 +10,7 @@ export default function ProdutosList() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch('https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos');
 
         if (!response.ok) {
           throw new Error(`Erro na resposta da API: ${response.status}`);
@@ -45,9 +44,16 @@ export default function ProdutosList() {
       <ScrollView contentContainerStyle={styles.productGrid}>
         {produtos.map((p, i) => (
           <View style={styles.productCard} key={i}>
-            <Ionicons name="shirt-outline" size={moderateScale(32)} color="#555" />
-            <Text style={styles.productText}>
-              {p.nome} - R${p.preco?.toFixed(2)}
+            <Image 
+              source={{ uri: p.url }} 
+              style={styles.productImage} 
+              resizeMode="cover"
+            />
+            <Text style={styles.productText} numberOfLines={2} ellipsizeMode="tail">
+              {p.nome}
+            </Text>
+            <Text style={styles.productPrice}>
+              R{p.valor}
             </Text>
           </View>
         ))}
@@ -67,21 +73,34 @@ const styles = StyleSheet.create({
   productGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    padding: scale(10),
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(10),
     paddingBottom: verticalScale(80),
   },
   productCard: {
-    alignItems: 'center',
-    marginVertical: verticalScale(10),
-    backgroundColor: '#f0f0f0',
-    padding: moderateScale(10),
-    borderRadius: moderateScale(10),
-    width: '45%',
+  alignItems: 'center',
+  marginVertical: verticalScale(10),
+  backgroundColor: '#f0f0f0',
+  padding: moderateScale(10),
+  borderRadius: moderateScale(10),
+  width: '30%',
+  height: verticalScale(180),
+},
+  productImage: {
+    width: '100%',
+    height: '70%',
+    borderRadius: moderateScale(8),
   },
   productText: {
     fontSize: fontScale(12),
     marginTop: verticalScale(5),
     textAlign: 'center',
+    color: '#333',
+  },
+  productPrice: {
+    fontSize: fontScale(12),
+    fontWeight: 'bold',
+    marginTop: verticalScale(2),
+    color: '#8A1B58',
   },
 });
