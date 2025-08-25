@@ -1,23 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import Header from '../components/header';
-import Footer from '../components/footer';
 import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Footer from '../components/footer';
+import Header from '../components/header';
 
 export default function AdicionarScreen() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Outros');
   const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosméticos'];
+  const [form, setForm] = useState({
+    nome: "", sobre: "", valor: "", categoria: "", imagem: "", estoque: ""
+  })
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
-
+      
+      <form>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Adicionar</Text>
 
         <TouchableOpacity style={styles.imageBox}>
           <MaterialIcons name="add" size={48} color="#fff" />
         </TouchableOpacity>
+
+                <TextInput
+          placeholder="url"
+          placeholderTextColor="#000000ff"
+          style={styles.inputHalf}
+          onChangeText={(text) => setForm({ ...form, imagem: text })}
+        />
 
         <TextInput
           placeholder="Nome"
@@ -70,6 +81,7 @@ export default function AdicionarScreen() {
           <Text style={styles.salvarText}>Salvar</Text>
         </TouchableOpacity>
       </ScrollView>
+      </form>
 
       <Footer />
     </SafeAreaView>

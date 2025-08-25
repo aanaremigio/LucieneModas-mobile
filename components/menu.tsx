@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
 
 const { width, height } = Dimensions.get('window');
 
@@ -85,11 +86,7 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
             <Text style={styles.link}>Cosméticos</Text>
             <Text style={styles.link}>Outros</Text>
           </>
-        )}
-
-        <TouchableOpacity style={styles.exitButton} onPress={onClose}>
-          <Text style={styles.exitText}>Sair</Text>
-        </TouchableOpacity>
+        )} 
       </Animated.View>
     </View>
   );
@@ -107,42 +104,28 @@ const styles = StyleSheet.create({
   menu: {
     position: 'absolute',
     right: 0,
-    top: 50,
+    top: verticalScale(50),
     bottom: 0,
     width: width * 0.6,
     backgroundColor: '#8A1B58',
-    paddingHorizontal: 20,
-    paddingTop: 100,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(100),
   },
   title: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 35,
-    marginBottom: 25,
+    fontSize: fontScale(35),
+    marginBottom: verticalScale(25),
   },
   subtitle: {
     color: '#FFD700',
-    fontSize: 20,
-    marginTop: 25,
-    marginBottom: 10,
+    fontSize: fontScale(20),
+    marginTop: verticalScale(25),
+    marginBottom: verticalScale(10),
   },
   link: {
     color: '#fff',
-    fontSize: 17,
-    marginVertical: 5,
-  },
-  exitButton: {
-    position: 'absolute',
-    bottom: 390,
-    right: 10,
-    borderColor: '#FFD700',
-    borderWidth: 3,
-    paddingVertical: 5,
-    paddingHorizontal: 30,
-  },
-  exitText: {
-    color: '#FFD700',
-    fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: fontScale(17),
+    marginVertical: verticalScale(5),
   },
 });
