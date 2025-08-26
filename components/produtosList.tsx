@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
-import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 
 export default function ProdutosList() {
   const [produtos, setProdutos] = useState<any[]>([]);
@@ -45,7 +45,7 @@ export default function ProdutosList() {
         {produtos.map((p, i) => (
           <View style={styles.productCard} key={i}>
             <Image 
-              source={{ uri: p.url }} 
+              source={{ uri: p.imagem }} 
               style={styles.productImage} 
               resizeMode="cover"
             />

@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
-import Header from '../components/header';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import Footer from '../components/footer';
+import Header from '../components/header';
 
 export default function AnaliseScreen() {
   return (
