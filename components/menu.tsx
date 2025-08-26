@@ -1,15 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Animated,
   Dimensions,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
+import { fontScale, scale, verticalScale } from '../coisasuteis/scale';
 
 const { width, height } = Dimensions.get('window');
 
@@ -80,11 +80,21 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
 
         {showCategorias && (
           <>
+          <TouchableOpacity onPress={() => navigate('/masculino')}>
             <Text style={styles.link}>Masculino</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate('/feminino')}>
             <Text style={styles.link}>Feminino</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate('/infantil')}>
             <Text style={styles.link}>Infantil</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate('/cosmeticos')}>
             <Text style={styles.link}>Cosméticos</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate('/outros')}>
             <Text style={styles.link}>Outros</Text>
+          </TouchableOpacity>
           </>
         )} 
       </Animated.View>
