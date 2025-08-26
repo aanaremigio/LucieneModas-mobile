@@ -2,6 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   Alert,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,186 +10,25 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-// Não há CSS modules no React Native, então criamos um objeto de estilo
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 15,
-  },
-  formContainer: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginTop: 15,
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
-  },
-  button: {
-    backgroundColor: "#6200ee",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  imagePickerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  imagePickerButton: {
-    backgroundColor: "#e0e0e0",
-    padding: 10,
-    borderRadius: 5,
-  },
-  imagePickerText: {
-    color: "#000",
-  },
-  radioGroup: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "48%",
-    marginBottom: 10,
-  },
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#000",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 8,
-  },
-  checkedCircle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#000",
-  },
-  radioLabel: {
-    fontSize: 16,
-  },
-});
+import Footer from '../components/footer';
+import Header from '../components/header';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ProdutosForm() {
+  const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosméticos'];
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('Outros');
   const [form, setForm] = useState({
-  nome: "",
-  sobre: "",
-  valor: "",
-  categoria: "",
-  imagem: null as ImagePicker.ImagePickerAsset | null, // agora aceita objeto
-  estoque: "",
-  });
-
-  // A função para lidar com o envio agora será para React Native
-  const handleSubmit = async () => {
-    // Validação básica
-    if (!form.imagem || !form.nome || !form.valor || !form.categoria) {
-      return Alert.alert("Erro!", "Preencha todos os campos obrigatórios.");
-    }
-
-    try {
-      // 1. Upload da imagem
-      const formData = new FormData();
-      if (form.imagem) {
-  formData.append("file", {
-    uri: form.imagem.uri, // ✅ certo
-    name: `photo-${Date.now()}.jpg`,
-    type: "image/jpeg",
-  } as any); // o "as any" ajuda a não dar conflito no TS
-}
-
-
-      const uploadRes = await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/upload", {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data", // Importante para o FormData funcionar
-        },
-      });
-
-      const { url } = await uploadRes.json();
-      const imagemUrl = url;
-
-      // 2. Envio dos dados do produto
-      const { nome, sobre, valor, categoria, estoque } = form;
-      await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome,
-          sobre,
-          valor: parseFloat(valor), // Converte o valor para número
-          categoria,
-          imagemUrl,
-          estoque: estoque ? parseInt(estoque) : 0, // Converte para número ou define 0
-        }),
-      });
-
-      Alert.alert("Sucesso!", "Produto adicionado com sucesso!");
-
-      // Limpa o formulário após o envio
-      setForm({
-        nome: "",
+    nome: "",
     sobre: "",
     valor: "",
     categoria: "",
-    imagem: null as ImagePicker.ImagePickerAsset | null, // agora aceita objeto
+    imagem: null as ImagePicker.ImagePickerAsset | null,
     estoque: "",
   });
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Erro!", "Não foi possível adicionar o produto.");
-    }
-  };
 
-  // Função para abrir a galeria de imagens
+  // Função para abrir galeria e selecionar imagem
   const pickImage = async () => {
-    // Solicita permissão da galeria
-    const { status } = await ImagePicker.
-      requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         "Permissão necessária",
@@ -209,95 +49,251 @@ export default function ProdutosForm() {
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Gerenciamento de Produtos</Text>
+  // Função de envio do formulário
+  const handleSubmit = async () => {
+    if (!form.imagem || !form.nome || !form.valor || !form.categoria) {
+      return Alert.alert("Erro!", "Preencha todos os campos obrigatórios.");
+    }
 
-      <Text style={styles.subtitle}>1. Adicionar Produtos</Text>
-      <View style={styles.formContainer}>
-        {/* Campo de imagem */}
-        <Text style={styles.label}>Imagem</Text>
-        <TouchableOpacity
-          style={styles.imagePickerButton}
-          onPress={pickImage}
-        >
-          <Text style={styles.imagePickerText}>
-            {form.imagem ? "Imagem selecionada" : "Escolher arquivo"}
-          </Text>
+    try {
+      const formData = new FormData();
+      if (form.imagem) {
+        formData.append("file", {
+          uri: form.imagem.uri,
+          name: `photo-${Date.now()}.jpg`,
+          type: "image/jpeg",
+        } as any);
+      }
+
+      const uploadRes = await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const { url } = await uploadRes.json();
+      const imagemUrl = url;
+
+      const { nome, sobre, valor, categoria, estoque } = form;
+      await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome,
+          sobre,
+          valor: parseFloat(valor),
+          categoria,
+          imagemUrl,
+          estoque: estoque ? parseInt(estoque) : 0,
+        }),
+      });
+
+      Alert.alert("Sucesso!", "Produto adicionado com sucesso!");
+
+      // Limpa formulário
+      setForm({
+        nome: "",
+        sobre: "",
+        valor: "",
+        categoria: "",
+        imagem: null,
+        estoque: "",
+      });
+      setCategoriaSelecionada('Outros');
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro!", "Não foi possível adicionar o produto.");
+    }
+  };
+
+  // Atualiza categoria ao clicar e mantém sincronizado no form
+  const onSelectCategoria = (categoria: string) => {
+    setCategoriaSelecionada(categoria);
+    setForm({ ...form, categoria });
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Header />
+
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Adicionar</Text>
+
+        <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
+          {form.imagem ? (
+            <Text style={{ color: '#000' }}>Imagem Selecionada</Text>
+          ) : (
+            <MaterialIcons name="add" size={48} color="#fff" />
+          )}
         </TouchableOpacity>
 
-        {/* Campo de nome */}
-        <Text style={styles.label}>Nome</Text>
         <TextInput
+          placeholder="Nome"
+          placeholderTextColor="#000000ff"
           style={styles.input}
-          placeholder="Nome do produto"
-          onChangeText={(text) => setForm({ ...form, nome: text })}
           value={form.nome}
+          onChangeText={(text) => setForm({ ...form, nome: text })}
         />
 
-        {/* Campo de valor */}
-        <Text style={styles.label}>Valor</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="39.99"
-          keyboardType="numeric" // Teclado numérico para valores
-          onChangeText={(text) => setForm({ ...form, valor: text })}
-          value={form.valor}
-        />
+        <View style={styles.row}>
+          <TextInput
+            placeholder="R$"
+            placeholderTextColor="#000000ff"
+            style={styles.inputHalf}
+            keyboardType="numeric"
+            value={form.valor}
+            onChangeText={(text) => setForm({ ...form, valor: text })}
+          />
 
-        {/* Campo sobre */}
-        <Text style={styles.label}>Sobre (Opcional)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Descrição do produto"
-          onChangeText={(text) => setForm({ ...form, sobre: text })}
-          value={form.sobre}
-        />
-
-        {/* Campo estoque */}
-        <Text style={styles.label}>Estoque (Opcional)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Quantidade"
-          keyboardType="numeric"
-          onChangeText={(text) => setForm({ ...form, estoque: text })}
-          value={form.estoque}
-        />
-
-        {/* Grupo de botões de rádio */}
-        <Text style={styles.label}>Categoria</Text>
-        <View style={styles.radioGroup}>
-          {[
-            "Roupas",
-            "Cosméticos",
-            "Masculino",
-            "Feminino",
-            "Infantil",
-            "Outros",
-          ].map((categoria) => (
-            <TouchableOpacity
-              key={categoria}
-              style={styles.radioButton}
-              onPress={() => setForm({ ...form, categoria })}
-            >
-              <View style={styles.radioCircle}>
-                {form.categoria === categoria && (
-                  <View style={styles.checkedCircle} />
-                )}
-              </View>
-              <Text style={styles.radioLabel}>{categoria}</Text>
-            </TouchableOpacity>
-          ))}
+          <TextInput
+            placeholder="Estoque"
+            placeholderTextColor="#000000ff"
+            style={styles.inputHalf}
+            keyboardType="numeric"
+            value={form.estoque}
+            onChangeText={(text) => setForm({ ...form, estoque: text })}
+          />
         </View>
 
-        {/* Botão de envio */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Adicionar Produto</Text>
-        </TouchableOpacity>
-      </View>
+        <TextInput
+          placeholder="Descrição"
+          placeholderTextColor="#000000ff"
+          multiline
+          style={styles.textArea}
+          value={form.sobre}
+          onChangeText={(text) => setForm({ ...form, sobre: text })}
+        />
 
-      <Text style={styles.subtitle}>2. Remover Produtos</Text>
-      <Text style={styles.subtitle}>3. Aplicar desconto</Text>
-    </ScrollView>
+        <Text style={styles.label}>Categorias</Text>
+        {categorias.map((categoria) => (
+          <TouchableOpacity
+            key={categoria}
+            style={[
+              styles.categoriaBtn,
+              categoriaSelecionada === categoria && styles.categoriaSelecionada,
+            ]}
+            onPress={() => onSelectCategoria(categoria)}
+          >
+            <Text
+              style={[
+                styles.categoriaText,
+                categoriaSelecionada === categoria && { color: '#fff' },
+              ]}
+            >
+              {categoria}
+            </Text>
+          </TouchableOpacity>
+        ))}
+
+        <TouchableOpacity style={styles.salvarBtn} onPress={handleSubmit}>
+          <Text style={styles.salvarText}>Salvar</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <Footer />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 22,
+    color: '#8A1B58',
+    fontWeight: 'bold',
+    marginVertical: 20,
+    alignSelf: 'center',
+  },
+  imageBox: {
+    height: 120,
+    backgroundColor: '#EFDDBB',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+    width: '90%',
+    maxWidth: 400,
+  },
+  input: {
+    backgroundColor: '#EFDDBB',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    width: '90%',
+    maxWidth: 400,
+    color: '#000',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    maxWidth: 400,
+    marginBottom: 10,
+  },
+  inputHalf: {
+    backgroundColor: '#EFDDBB',
+    borderRadius: 8,
+    padding: 10,
+    width: '48%',
+    color: '#000',
+  },
+  textArea: {
+    backgroundColor: '#EFDDBB',
+    borderRadius: 8,
+    padding: 10,
+    height: 100,
+    textAlignVertical: 'top',
+    marginBottom: 15,
+    width: '90%',
+    maxWidth: 400,
+    color: '#000',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    alignSelf: 'flex-start',
+    width: '90%',
+    maxWidth: 400,
+  },
+  categoriaBtn: {
+    backgroundColor: '#EFDDBB',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 3,
+    width: '90%',
+    maxWidth: 400,
+  },
+  categoriaSelecionada: {
+    backgroundColor: '#8A1B58',
+  },
+  categoriaText: {
+    color: '#000000ff',
+    textAlign: 'center',
+  },
+  salvarBtn: {
+    backgroundColor: 'white',
+    borderColor: '#8A1B58',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginTop: 20,
+    width: '90%',
+    maxWidth: 400,
+  },
+  salvarText: {
+    color: '#8A1B58',
+    fontWeight: 'bold',
+    alignSelf: 'center',
+  },
+});
+    

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
+import { useRouter } from 'expo-router';
 
 export default function ProdutosList() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProdutos = async () => {
@@ -43,19 +45,23 @@ export default function ProdutosList() {
       <Text style={styles.sectionTitle}>Produtos</Text>
       <ScrollView contentContainerStyle={styles.productGrid}>
         {produtos.map((p, i) => (
-          <View style={styles.productCard} key={i}>
-            <Image 
-              source={{ uri: p.imagem }} 
-              style={styles.productImage} 
+          <TouchableOpacity 
+            key={i} 
+            style={styles.productCard} 
+            onPress={() => router.push({ pathname: '/produto', params: { ...p } })}
+          >
+            <Image
+              source={{ uri: p.imagem }}
+              style={styles.productImage}
               resizeMode="cover"
             />
             <Text style={styles.productText} numberOfLines={2} ellipsizeMode="tail">
               {p.nome}
             </Text>
             <Text style={styles.productPrice}>
-              R{p.valor}
+              R$ {p.valor}
             </Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </>
@@ -78,14 +84,14 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(80),
   },
   productCard: {
-  alignItems: 'center',
-  marginVertical: verticalScale(10),
-  backgroundColor: '#f0f0f0',
-  padding: moderateScale(10),
-  borderRadius: moderateScale(10),
-  width: '30%',
-  height: verticalScale(180),
-},
+    alignItems: 'center',
+    marginVertical: verticalScale(10),
+    backgroundColor: '#f0f0f0',
+    padding: moderateScale(10),
+    borderRadius: moderateScale(10),
+    width: '30%',
+    height: verticalScale(180),
+  },
   productImage: {
     width: '100%',
     height: '70%',
