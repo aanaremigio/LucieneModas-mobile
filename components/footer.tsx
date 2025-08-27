@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scale, verticalScale, moderateScale } from '../coisasuteis/scale';
 
 
-type Aba = 'profile' | 'home' | 'chart';
+type Aba = 'request' | 'home' | 'chart';
 
 
 export default function Footer() {
@@ -15,14 +15,14 @@ export default function Footer() {
   const insets = useSafeAreaInsets();
 
 
-  const scaleProfile = new Animated.Value(1);
+  const scaleRequest = new Animated.Value(1);
   const scaleHome = new Animated.Value(1);
   const scaleChart = new Animated.Value(1);
 
 
   const resetAll = () => {
     Animated.parallel([
-      Animated.timing(scaleProfile, { toValue: 1, duration: 150, useNativeDriver: true }),
+      Animated.timing(scaleRequest, { toValue: 1, duration: 150, useNativeDriver: true }),
       Animated.timing(scaleHome, { toValue: 1, duration: 150, useNativeDriver: true }),
       Animated.timing(scaleChart, { toValue: 1, duration: 150, useNativeDriver: true }),
     ]).start();
@@ -32,7 +32,7 @@ export default function Footer() {
   const animateActive = (tab: Aba) => {
     resetAll();
     Animated.timing(
-      tab === 'profile' ? scaleProfile :
+      tab === 'request' ? scaleRequest :
       tab === 'chart' ? scaleChart :
       scaleHome,
       { toValue: 1.4, duration: 150, useNativeDriver: true }
@@ -41,7 +41,7 @@ export default function Footer() {
 
 
   useEffect(() => {
-    if (pathname === '/perfil') animateActive('profile');
+    if (pathname === '/pedidos') animateActive('request');
     else if (pathname === '/analise') animateActive('chart');
     else animateActive('home');
   }, [pathname]);
@@ -49,7 +49,7 @@ export default function Footer() {
 
   const handlePress = (tab: Aba) => {
     animateActive(tab);
-    if (tab === 'profile') router.push('/perfil');
+    if (tab === 'request') router.push('/pedidos');
     else if (tab === 'chart') router.push('/analise');
     else router.push('/home');
   };
@@ -57,9 +57,9 @@ export default function Footer() {
 
   return (
     <View style={[styles.footer, { paddingBottom: insets.bottom || verticalScale(10) }]}>
-      <TouchableOpacity onPress={() => handlePress('profile')} activeOpacity={0.8}>
-        <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleProfile }] }]}>
-          <FontAwesome5 name="user" size={moderateScale(24)} color="#8A1B58" />
+      <TouchableOpacity onPress={() => handlePress('request')} activeOpacity={0.8}>
+        <Animated.View style={[styles.footerIcon, { transform: [{ scale: scaleRequest }] }]}>
+         <MaterialIcons name="inventory" size={moderateScale(24)} color="#8A1B58" />
         </Animated.View>
       </TouchableOpacity>
 

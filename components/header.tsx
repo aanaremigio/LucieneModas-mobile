@@ -25,13 +25,10 @@ export default function Header() {
           },
         ]}
       >
-        {/* Ícone do perfil com margem esquerda */}
-        <TouchableOpacity 
-          onPress={() => router.push('/perfil')} 
-          style={{ marginLeft: scale(15) }}
-        >
-          <FontAwesome5 name="user-circle" size={moderateScale(28)} color="#fff" />
-        </TouchableOpacity>
+      //   <TouchableOpacity 
+         style={{ marginLeft: scale(15) }}
+      >
+      //   </TouchableOpacity>
 
         {/* Logo centralizado */}
         <TouchableOpacity onPress={() => router.replace('/')}>
@@ -47,7 +44,7 @@ export default function Header() {
           onPress={() => setIsMenuOpen(true)} 
           style={{ marginRight: scale(15) }}
         >
-          <Feather name="menu" size={moderateScale(28)} color="#fff" />
+          <Feather name="menu" size={moderateScale(28)} color="#C2A33E" />
         </TouchableOpacity>
       </View>
 
