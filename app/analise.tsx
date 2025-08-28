@@ -1,6 +1,12 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
@@ -9,7 +15,7 @@ export default function AnaliseScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
 
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Painel de análise</Text>
         <Text style={styles.subtitle}>Status -</Text>
 
@@ -35,9 +41,8 @@ export default function AnaliseScreen() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>36</Text>
           </View>
-        </View>
-      </View>
-
+        </View> 
+      </ScrollView>
       <Footer />
     </SafeAreaView>
   );
@@ -45,9 +50,10 @@ export default function AnaliseScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,               // necessário para o ScrollView funcionar corretamente
     padding: 20,
     backgroundColor: '#fff',
+    paddingBottom: 100,       
   },
   title: {
     fontSize: 22,

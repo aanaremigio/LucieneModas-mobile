@@ -25,10 +25,10 @@ export default function Header() {
           },
         ]}
       >
-      //   <TouchableOpacity 
+      <TouchableOpacity 
          style={{ marginLeft: scale(15) }}
       >
-      //   </TouchableOpacity>
+      </TouchableOpacity>
 
         {/* Logo centralizado */}
         <TouchableOpacity onPress={() => router.replace('/')}>

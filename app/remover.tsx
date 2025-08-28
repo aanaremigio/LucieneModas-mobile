@@ -23,21 +23,18 @@ export default function RemoverScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Header />
-
-      {/* Título e Ícone da Lixeira */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>Remover</Text>
         <TouchableOpacity
           onPress={() => setIsSelectionMode(prev => !prev)}
           style={styles.trashButton}
-          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} // aumenta área clicável
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
           <MaterialIcons name="delete" size={30} color="#000" />
         </TouchableOpacity>
       </View>
 
-      {/* Lista de Produtos */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.productGrid}>
           {produtos.map(item => (
             <View key={item.id} style={styles.productCard}>
@@ -65,7 +62,6 @@ export default function RemoverScreen() {
           ))}
         </View>
 
-        {/* Botão Apagar para Sempre */}
         {isSelectionMode && (
           <TouchableOpacity
             style={styles.deleteButton}
@@ -75,7 +71,6 @@ export default function RemoverScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
-
       <Footer />
     </View>
   );
@@ -89,7 +84,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   title: {
-    top: 10, 
+    top: 10,
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
@@ -97,10 +92,11 @@ const styles = StyleSheet.create({
   trashButton: {
     position: 'absolute',
     right: 20,
-    top: 30, 
-    zIndex: 10, 
+    top: 30,
+    zIndex: 10,
   },
   scrollContent: {
+    flexGrow: 1,
     paddingBottom: 120,
   },
   productGrid: {
