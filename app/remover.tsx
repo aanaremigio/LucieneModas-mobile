@@ -24,41 +24,46 @@ export default function RemoverScreen() {
     <View style={{ flex: 1 }}>
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>Remover</Text>
-        <TouchableOpacity
-          onPress={() => setIsSelectionMode(prev => !prev)}
-          style={styles.trashButton}
-          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        >
-          <MaterialIcons name="delete" size={30} color="#000" />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.headerContainer}>
+          <Text style={styles.title}>Remover</Text>
+          <TouchableOpacity
+            onPress={() => setIsSelectionMode(prev => !prev)}
+            style={styles.trashButton}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          >
+            <MaterialIcons name="delete" size={40} color="#000" />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.productGrid}>
           {produtos.map(item => (
-            <View key={item.id} style={styles.productCard}>
-              <Ionicons name="shirt-outline" size={32} color="#555" />
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.productCard,
+                selectedItems.includes(item.id) && { borderColor: '#8A1B58', borderWidth: 2 }
+              ]}
+              activeOpacity={0.7}
+              onPress={() => isSelectionMode && toggleSelection(item.id)}
+            >
+              <Ionicons name="shirt-outline" size={40} color="#555" />
               {isSelectionMode && (
-                <TouchableOpacity
-                  style={styles.checkbox}
-                  onPress={() => toggleSelection(item.id)}
-                >
+                <View style={styles.checkbox}>
                   <MaterialIcons
                     name={
                       selectedItems.includes(item.id)
                         ? 'check-box'
                         : 'check-box-outline-blank'
                     }
-                    size={22}
+                    size={26}
                     color="#8A1B58"
                   />
-                </TouchableOpacity>
+                </View>
               )}
               <Text style={styles.productText}>
                 {item.nome} {item.preco}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -85,14 +90,14 @@ const styles = StyleSheet.create({
   },
   title: {
     top: 10,
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#000',
   },
   trashButton: {
     position: 'absolute',
     right: 20,
-    top: 30,
+    top: 40,
     zIndex: 10,
   },
   scrollContent: {
@@ -100,30 +105,31 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   productGrid: {
-    marginTop: 60,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    paddingHorizontal: 10,
-  },
-  productCard: {
-    width: '28%',
-    alignItems: 'center',
-    margin: 10,
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 10,
-    position: 'relative',
-  },
+  marginTop: 60,
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  paddingHorizontal: 10,
+},
+productCard: {
+  width: '30%',
+  alignItems: 'center',
+  marginBottom: 15, 
+  backgroundColor: '#f0f0f0',
+  padding: 10,
+  borderRadius: 10,
+  position: 'relative',
+},
   productText: {
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: 14,
+    marginTop: 8,
     textAlign: 'center',
+    fontWeight: '500',
   },
   checkbox: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: 8,
+    right: 8,
   },
   deleteButton: {
     alignSelf: 'flex-end',
@@ -133,12 +139,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#8A1B58',
     borderWidth: 2,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    borderRadius: 8,
   },
   deleteButtonText: {
     color: '#8A1B58',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 15,
   },
 });
