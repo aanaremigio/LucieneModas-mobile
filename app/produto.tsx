@@ -1,97 +1,132 @@
-import { useLocalSearchParams } from 'expo-router';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
-import Footer from '../components/footer';
 import Header from '../components/header';
+import Footer from '../components/footer';
+
 
 export default function Produto() {
   const params = useLocalSearchParams();
-  const handleSubmit = async (id : any, imagem : any) => {
+  const router = useRouter();
 
-      try {
-  
-        await fetch(`https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${id}`, {
-          method: "DELETE",
-          body: JSON.stringify({url: imagem}),
-          headers: { "Content-Type": "application/json" },
-        });
-  
-        
-        return Alert.alert("Sucesso!", "Produto adicionado com sucesso!");
-  
-      } catch (error) {
-        console.error(error);
-        return Alert.alert("Erro!", "Não foi possível adicionar o produto.");
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`http://SEU_BACKEND_URL/produtos/${params.id}`, {
+        method: 'DELETE',
+      });
+
+
+      if (response.ok) {
+        Alert.alert("Sucesso", "Produto deletado com sucesso!");
+        router.back(); // volta para a tela anterior (lista de produtos)
+      } else {
+        Alert.alert("Erro", "Não foi possível deletar o produto.");
       }
-    };
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Falha ao conectar com o servidor.");
+    }
+  };
+
 
   return (
     <View style={{ flex: 1 }}>
       <Header />
 
+
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={{ uri: params.imagem as string }} style={styles.image} resizeMode="cover" />
-        <Text style={styles.title}>{params.nome}</Text>
-        <Text style={styles.price}>R$ {params.valor}</Text>
+        {/* Imagem */}
+        <Image source={{ uri: params.imagem as string }} style={styles.image} resizeMode="contain" />
+
+
+        {/* Categoria e Preço */}
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.category}>{params.categoria}</Text>
+            <Text style={styles.title}>{params.nome}</Text>
+          </View>
+          <Text style={styles.price}>R$ {params.valor}</Text>
+        </View>
+
+
+        {/* Descrição */}
+        <Text style={styles.descriptionTitle}>Descrição</Text>
         <Text style={styles.description}>
-          {params.descricao || "Sem descrição disponível."}
+          {params.sobre       || "Sem descrição disponível."}
         </Text>
-        <TouchableOpacity style={styles.salvarBtn} onPress={() => handleSubmit(params.id, params.imagem)}>
-          <Text style={styles.salvarText}>Deletar</Text>
+
+
+        {/* Botão deletar */}
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+          <Text style={styles.deleteText}>Deletar Produto</Text>
         </TouchableOpacity>
       </ScrollView>
+
 
       <Footer />
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     padding: scale(20),
-    alignItems: 'center',
     backgroundColor: '#fff',
-    paddingBottom: verticalScale(40),
+    paddingBottom: verticalScale(80),
   },
   image: {
-    width: '80%',
-    height: verticalScale(350),
+    width: '100%',
+    height: verticalScale(280),
     borderRadius: moderateScale(10),
-    marginBottom: verticalScale(30),
+    marginBottom: verticalScale(25),
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: verticalScale(15),
+  },
+  category: {
+    fontSize: fontScale(14),
+    color: '#777',
+    marginBottom: verticalScale(4),
   },
   title: {
-    fontSize: fontScale(20),
+    fontSize: fontScale(18),
     fontWeight: 'bold',
     color: '#8A1B58',
-    marginBottom: verticalScale(10),
-    textAlign: 'center',
+    maxWidth: '75%',
   },
   price: {
     fontSize: fontScale(18),
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: verticalScale(15),
+  },
+  descriptionTitle: {
+    fontSize: fontScale(16),
+    color: '#8A1B58',
+    fontWeight: 'bold',
+    marginTop: verticalScale(20),
+    marginBottom: verticalScale(5),
   },
   description: {
     fontSize: fontScale(14),
     textAlign: 'justify',
     color: '#555',
+    marginBottom: verticalScale(30),
   },
-  salvarBtn: {
-    backgroundColor: 'white',
-    borderColor: '#8A1B58',
-    borderWidth: 3,
-    padding: 10,
-    borderRadius: 4,
-    alignSelf: 'center',
-    marginTop: 14,
-    width: '90%',
-    maxWidth: 400,
+  deleteButton: {
+    backgroundColor: '#8A1B58',
+    paddingVertical: verticalScale(12),
+    borderRadius: moderateScale(8),
+    alignItems: 'center',
+    marginTop: verticalScale(10),
   },
-  salvarText: {
-    color: '#8A1B58',
+  deleteText: {
+    color: '#fff',
+    fontSize: fontScale(16),
     fontWeight: 'bold',
-    alignSelf: 'center',
   },
 });
- 
