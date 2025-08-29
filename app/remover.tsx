@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import Header from '../components/header';
+import { useRouter } from 'expo-router'; // ✅ import do router
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
-
+import Header from '../components/header';
 
 export default function RemoverScreen() {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // ✅ inicializa o router
 
-
-  // Buscar produtos da API
   const fetchProdutos = async () => {
     try {
       setLoading(true);
@@ -28,27 +37,22 @@ export default function RemoverScreen() {
     }
   };
 
-
   useEffect(() => {
     fetchProdutos();
   }, []);
 
-
-  // Seleção de produtos
   const toggleSelection = (item: any) => {
     setSelectedItems(prev =>
       prev.find((el) => el.id == item.id) ? prev.filter(el => el.id !== item.id) : [...prev, item]
     );
   };
 
-
-  // Deletar produtos selecionados
   const deleteSelected = async () => {
     try {
       for (const item of selectedItems) {
         const response = await fetch(`https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${item.id}`, {
           method: "DELETE",
-          body: JSON.stringify({url: item.imagem}),
+          body: JSON.stringify({ url: item.imagem }),
           headers: { "Content-Type": "application/json" },
         });
         if (!response.ok) throw new Error(`Erro ao deletar produto ${item.id}`);
@@ -62,11 +66,9 @@ export default function RemoverScreen() {
     }
   };
 
-
   if (loading) {
     return <ActivityIndicator size="large" color="#8A1B58" style={{ marginTop: 40 }} />;
   }
-
 
   return (
     <View style={{ flex: 1 }}>
@@ -83,7 +85,6 @@ export default function RemoverScreen() {
           </TouchableOpacity>
         </View>
 
-
         <View style={styles.productGrid}>
           {produtos.map(item => (
             <TouchableOpacity
@@ -93,7 +94,13 @@ export default function RemoverScreen() {
                 selectedItems.find(el => el.id == item.id) && { borderColor: '#8A1B58', borderWidth: 2 }
               ]}
               activeOpacity={0.7}
-              onPress={() => isSelectionMode && toggleSelection(item)}
+              onPress={() => {
+                if (isSelectionMode) {
+                  toggleSelection(item);
+                } else {
+                  router.push({ pathname: '/produto', params: { ...item } }); // ✅ Abre detalhes
+                }
+              }}
             >
               {item.imagem ? (
                 <Image source={{ uri: item.imagem }} style={styles.productImage} resizeMode="cover" />
@@ -119,7 +126,6 @@ export default function RemoverScreen() {
           ))}
         </View>
 
-
         {isSelectionMode && (
           <TouchableOpacity
             style={styles.deleteButton}
@@ -133,7 +139,6 @@ export default function RemoverScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -159,26 +164,26 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   productGrid: {
-    marginTop: 60,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: scale(10),
+    paddingBottom: verticalScale(80),
+    marginTop: 50,
   },
   productCard: {
-    width: '30%',
     alignItems: 'center',
-    marginBottom: 15,
+    marginVertical: verticalScale(10),
     backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 10,
-    position: 'relative',
+    padding: moderateScale(10),
+    borderRadius: moderateScale(10),
+    width: '30%',
+    height: verticalScale(180),
   },
   productImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 8,
-    marginBottom: 8,
+    height: '70%',
+    borderRadius: moderateScale(8),
   },
   productText: {
     fontSize: 14,

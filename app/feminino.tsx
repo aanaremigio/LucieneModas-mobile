@@ -1,11 +1,23 @@
+import { useRouter } from 'expo-router'; // ✅ Importação do router
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, ScrollView, ActivityIndicator, Image } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
-export default function OutrosScreen() {
+export default function FemininoScreen() {
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // ✅ Inicialização do router
 
   useEffect(() => {
     const fetchProdutos = async () => {
@@ -13,9 +25,8 @@ export default function OutrosScreen() {
         const response = await fetch('https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos');
         const data = await response.json();
 
-        // Filtra só os produtos da categoria "Feminino"
-        const outros = data.filter((p: any) => p.categoria === 'Feminino');
-        setProdutos(outros);
+        const feminino = data.filter((p: any) => p.categoria === 'Feminino');
+        setProdutos(feminino);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);
       } finally {
@@ -40,7 +51,11 @@ export default function OutrosScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.productGrid}>
             {produtos.map((item: any) => (
-              <View key={item.id} style={styles.productCard}>
+              <TouchableOpacity
+                key={item.id}
+                style={styles.productCard}
+                onPress={() => router.push({ pathname: '/produto', params: { ...item } })}
+              >
                 <Image
                   source={{ uri: item.imagem }}
                   style={styles.productImage}
@@ -48,7 +63,7 @@ export default function OutrosScreen() {
                 />
                 <Text style={styles.productText} numberOfLines={2}>{item.nome}</Text>
                 <Text style={styles.productPrice}>R$ {item.valor}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
@@ -76,20 +91,23 @@ const styles = StyleSheet.create({
   productGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    paddingHorizontal: scale(10),
+    paddingBottom: verticalScale(80),
   },
   productCard: {
-    width: '40%',
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: verticalScale(10),
     backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 10,
+    padding: moderateScale(10),
+    borderRadius: moderateScale(10),
+    width: '30%',
+    height: verticalScale(180),
   },
   productImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 8,
+    height: '70%',
+    borderRadius: moderateScale(8),
   },
   productText: {
     fontSize: 12,
@@ -104,4 +122,3 @@ const styles = StyleSheet.create({
     color: '#8A1B58',
   },
 });
-     

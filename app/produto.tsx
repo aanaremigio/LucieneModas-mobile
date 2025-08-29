@@ -1,21 +1,22 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
-import Header from '../components/header';
 import Footer from '../components/footer';
-
+import Header from '../components/header';
 
 export default function Produto() {
   const params = useLocalSearchParams();
   const router = useRouter();
 
-
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://SEU_BACKEND_URL/produtos/${params.id}`, {
+      const response = await fetch(`https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${params.id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: params.imagem }), // Envia imagem se necessário
       });
-
 
       if (response.ok) {
         Alert.alert("Sucesso", "Produto deletado com sucesso!");
@@ -29,16 +30,13 @@ export default function Produto() {
     }
   };
 
-
   return (
     <View style={{ flex: 1 }}>
       <Header />
 
-
       <ScrollView contentContainerStyle={styles.container}>
         {/* Imagem */}
         <Image source={{ uri: params.imagem as string }} style={styles.image} resizeMode="contain" />
-
 
         {/* Categoria e Preço */}
         <View style={styles.headerRow}>
@@ -49,13 +47,11 @@ export default function Produto() {
           <Text style={styles.price}>R$ {params.valor}</Text>
         </View>
 
-
         {/* Descrição */}
         <Text style={styles.descriptionTitle}>Descrição</Text>
         <Text style={styles.description}>
-          {params.sobre       || "Sem descrição disponível."}
+          {params.sobre || "Sem descrição disponível."}
         </Text>
-
 
         {/* Botão deletar */}
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
@@ -63,12 +59,10 @@ export default function Produto() {
         </TouchableOpacity>
       </ScrollView>
 
-
       <Footer />
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

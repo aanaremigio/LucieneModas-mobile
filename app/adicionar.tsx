@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
@@ -14,10 +15,9 @@ import {
 } from "react-native";
 import Footer from '../components/footer';
 import Header from '../components/header';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ProdutosForm() {
-  const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosméticos'];
+  const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosmeticos'];
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Outros');
   const [form, setForm] = useState({
     nome: "",
