@@ -15,18 +15,18 @@ export default function Produto() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: params.imagem }), // Envia imagem se necessário
+        body: JSON.stringify({ url: params.imagem }), 
       });
 
       if (response.ok) {
-        Alert.alert("Sucesso", "Produto deletado com sucesso!");
-        router.back(); // volta para a tela anterior (lista de produtos)
+        Alert.alert('Sucesso', 'Produto deletado com sucesso!');
+        router.back(); 
       } else {
-        Alert.alert("Erro", "Não foi possível deletar o produto.");
+        Alert.alert('Erro', 'Não foi possível deletar o produto.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Erro", "Falha ao conectar com o servidor.");
+      Alert.alert('Erro', 'Falha ao conectar com o servidor.');
     }
   };
 
@@ -50,7 +50,7 @@ export default function Produto() {
         {/* Descrição */}
         <Text style={styles.descriptionTitle}>Descrição</Text>
         <Text style={styles.description}>
-          {params.sobre || "Sem descrição disponível."}
+          {params.sobre || 'Sem descrição disponível.'}
         </Text>
 
         {/* Botão deletar */}
