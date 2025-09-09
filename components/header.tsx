@@ -21,14 +21,17 @@ export default function Header() {
           {
             paddingTop: (insets.top || verticalScale(5)) + verticalScale(5),
             paddingBottom: verticalScale(15),
-            paddingHorizontal: scale(5), // mantém um pequeno padding geral
+            paddingHorizontal: scale(5),
           },
         ]}
       >
-      <TouchableOpacity 
-         style={{ marginLeft: scale(15) }}
-      >
-      </TouchableOpacity>
+        {/* Botão de voltar */}
+        <TouchableOpacity
+          style={{ marginLeft: scale(15) }}
+          onPress={() => router.back()}  // volta para a página anterior
+        >
+          <FontAwesome5 name="arrow-left" size={moderateScale(22)} color="#fff" />
+        </TouchableOpacity>
 
         {/* Logo centralizado */}
         <TouchableOpacity onPress={() => router.replace('/')}>
@@ -39,12 +42,12 @@ export default function Header() {
           />
         </TouchableOpacity>
 
-        {/* Ícone do menu com margem direita */}
-        <TouchableOpacity 
-          onPress={() => setIsMenuOpen(true)} 
+        {/* Ícone do menu */}
+        <TouchableOpacity
+          onPress={() => setIsMenuOpen(true)}
           style={{ marginRight: scale(15) }}
         >
-          <Feather name="menu" size={moderateScale(28)} color="#C2A33E" />
+          <Feather name="menu" size={moderateScale(28)} color="#c23e3eff" />
         </TouchableOpacity>
       </View>
 
@@ -55,12 +58,12 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#8A1B58', 
+    backgroundColor: '#8A1B58',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
     zIndex: 10000,
-    minHeight: verticalScale(60), 
+    minHeight: verticalScale(60),
   },
   logoImage: {
     height: verticalScale(35),
