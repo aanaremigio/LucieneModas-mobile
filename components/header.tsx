@@ -47,7 +47,7 @@ export default function Header() {
           onPress={() => setIsMenuOpen(true)}
           style={{ marginRight: scale(15) }}
         >
-          <Feather name="menu" size={moderateScale(28)} color="#c23e3eff" />
+          <Feather name="menu" size={moderateScale(28)} color="#ffffffff" />
         </TouchableOpacity>
       </View>
 

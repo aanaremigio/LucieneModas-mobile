@@ -93,7 +93,7 @@ export default function PedidosListScreen() {
               onPress={toggleStatus}
             >
               <Text style={styles.updateButtonText}>
-                {statusEnviado ? 'Enviado' : 'Atualizar para enviado'}
+                {statusEnviado ? 'Enviado' : 'Em espera'}
               </Text>
             </TouchableOpacity>
 
@@ -216,10 +216,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   updateButtonPendente: {
-    backgroundColor: '#E2AD48', // dourado
+    backgroundColor: '#8A1B58', 
   },
   updateButtonEnviado: {
-    backgroundColor: '#4CAF50', // verde
+    backgroundColor: '#E2AD48', 
   },
   updateButtonText: {
     color: '#fff',
