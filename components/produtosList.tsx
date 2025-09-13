@@ -1,6 +1,7 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 
 export default function ProdutosList() {
@@ -12,7 +13,7 @@ export default function ProdutosList() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch('https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos');
 
         if (!response.ok) {
           throw new Error(`Erro na resposta da API: ${response.status}`);
@@ -50,11 +51,20 @@ export default function ProdutosList() {
             style={styles.productCard} 
             onPress={() => router.push({ pathname: '/produto', params: { ...p } })}
           >
-            <Image
-              source={{ uri: p.imagem }}
-              style={styles.productImage}
-              resizeMode="cover"
-            />
+            <View style={{ width: '100%', height: '70%' }}>
+              <Image
+                source={{ uri: p.imagem }}
+                style={styles.productImage}
+                resizeMode="cover"
+              />
+              {/* Ícone de exclamação se estoque = 0 */}
+              {p.estoque === 0 && (
+                <View style={styles.warningIcon}>
+                  <MaterialIcons name="error" size={22} color="#F5B600" />
+                </View>
+              )}
+            </View>
+
             <Text style={styles.productText} numberOfLines={2} ellipsizeMode="tail">
               {p.nome}
             </Text>
@@ -94,7 +104,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '100%',
-    height: '70%',
+    height: '100%',
     borderRadius: moderateScale(8),
   },
   productText: {
@@ -108,5 +118,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: verticalScale(2),
     color: '#8A1B58',
+  },
+  warningIcon: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 2,
+    elevation: 3,
   },
 });

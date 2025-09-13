@@ -1,5 +1,5 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // ✅ import do router
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -20,12 +20,12 @@ export default function RemoverScreen() {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter(); // ✅ inicializa o router
+  const router = useRouter();
 
   const fetchProdutos = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos");
+      const response = await fetch("https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos");
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const data = await response.json();
       setProdutos(data);
@@ -50,7 +50,7 @@ export default function RemoverScreen() {
   const deleteSelected = async () => {
     try {
       for (const item of selectedItems) {
-        const response = await fetch(`https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${item.id}`, {
+        const response = await fetch(`https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos/${item.id}`, {
           method: "DELETE",
           body: JSON.stringify({ url: item.imagem }),
           headers: { "Content-Type": "application/json" },
@@ -59,7 +59,7 @@ export default function RemoverScreen() {
       }
       Alert.alert("Sucesso", "Produtos removidos com sucesso!");
       setSelectedItems([]);
-      fetchProdutos(); // Atualiza lista
+      fetchProdutos();
     } catch (err) {
       console.error(err);
       Alert.alert("Erro", "Não foi possível apagar os produtos.");
@@ -98,28 +98,24 @@ export default function RemoverScreen() {
                 if (isSelectionMode) {
                   toggleSelection(item);
                 } else {
-                  router.push({ pathname: '/produto', params: { ...item } }); // ✅ Abre detalhes
+                  router.push({ pathname: '/produto', params: { ...item } });
                 }
               }}
             >
-              {item.imagem ? (
-                <Image source={{ uri: item.imagem }} style={styles.productImage} resizeMode="cover" />
-              ) : (
-                <Ionicons name="shirt-outline" size={40} color="#555" />
-              )}
-              {isSelectionMode && (
-                <View style={styles.checkbox}>
-                  <MaterialIcons
-                    name={
-                      selectedItems.find(el => el.id == item.id)
-                        ? 'check-box'
-                        : 'check-box-outline-blank'
-                    }
-                    size={26}
-                    color="#8A1B58"
-                  />
-                </View>
-              )}
+              <View style={{ width: '100%', height: '70%' }}>
+                {item.imagem ? (
+                  <Image source={{ uri: item.imagem }} style={styles.productImage} resizeMode="cover" />
+                ) : (
+                  <Ionicons name="shirt-outline" size={40} color="#555" />
+                )}
+                {/* Ícone de alerta se estoque = 0 */}
+                {item.estoque === 0 && (
+                  <View style={styles.warningIcon}>
+                    <MaterialIcons name="error" size={22} color="#F5B600" />
+                  </View>
+                )}
+              </View>
+
               <Text style={styles.productText} numberOfLines={2}>{item.nome}</Text>
               <Text style={styles.productPrice}>R$ {item.valor}</Text>
             </TouchableOpacity>
@@ -182,7 +178,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '100%',
-    height: '70%',
+    height: '100%',
     borderRadius: moderateScale(8),
   },
   productText: {
@@ -190,12 +186,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
     color: '#333',
+    marginTop: verticalScale(5),
   },
   productPrice: {
     fontSize: 13,
     fontWeight: 'bold',
     color: '#8A1B58',
-    marginTop: 4,
+    marginTop: verticalScale(2),
+  },
+  warningIcon: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 2,
+    elevation: 3,
   },
   checkbox: {
     position: 'absolute',

@@ -1,6 +1,7 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,61 @@ import Footer from '../components/footer';
 import Header from '../components/header';
 
 export default function AnaliseScreen() {
+  const [produtos, setProdutos] = useState<any[]>([]);
+  const [acabouNoEstoque, setAcabouNoEstoque] = useState(0);
+
+  // Função para buscar produtos e atualizar estoque esgotado
+  const fetchProdutos = async () => {
+    try {
+      const response = await fetch('https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos');
+      if (!response.ok) throw new Error('Erro ao buscar produtos');
+      const data = await response.json();
+      setProdutos(data);
+
+      // Contar quantos produtos estão com estoque 0
+      const esgotados = data.filter((p: any) => p.estoque === 0).length;
+      setAcabouNoEstoque(esgotados);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Erro', 'Não foi possível carregar os produtos.');
+    }
+  };
+
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  // Função para deletar produto e atualizar contagem
+  const deleteProduto = async (produtoId: number) => {
+    try {
+      const produto = produtos.find(p => p.id === produtoId);
+      if (!produto) return;
+
+      const response = await fetch(`https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos/${produtoId}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ url: produto.imagem }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) throw new Error('Erro ao deletar produto');
+
+      Alert.alert('Sucesso', 'Produto apagado com sucesso!');
+
+      // Atualiza lista de produtos
+      const novosProdutos = produtos.filter(p => p.id !== produtoId);
+      setProdutos(novosProdutos);
+
+      // Atualiza contagem de estoque esgotado se necessário
+      if (produto.estoque === 0) {
+        setAcabouNoEstoque(prev => prev - 1);
+      }
+
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Erro', 'Não foi possível apagar o produto.');
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
@@ -23,7 +79,7 @@ export default function AnaliseScreen() {
           <FontAwesome5 name="box-open" size={45} color="#C2A33E" />
           <Text style={styles.cardText}>Acabou no estoque</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>12</Text>
+            <Text style={styles.badgeText}>{acabouNoEstoque}</Text>
           </View>
         </View>
 
@@ -41,7 +97,7 @@ export default function AnaliseScreen() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>36</Text>
           </View>
-        </View> 
+        </View>
       </ScrollView>
       <Footer />
     </SafeAreaView>
@@ -50,10 +106,10 @@ export default function AnaliseScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,               // necessário para o ScrollView funcionar corretamente
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
-    paddingBottom: 100,       
+    paddingBottom: 100,
   },
   title: {
     fontSize: 22,

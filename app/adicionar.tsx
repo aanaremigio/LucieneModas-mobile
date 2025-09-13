@@ -60,7 +60,7 @@ export default function ProdutosForm() {
         } as any);
       }
 
-      const uploadRes = await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/upload", {
+      const uploadRes = await fetch("https://f9nkf6h4-3000.brs.devtunnels.ms/api/upload", {
         method: "POST",
         body: formData,
         headers: { "Content-Type": "multipart/form-data" },
@@ -70,7 +70,7 @@ export default function ProdutosForm() {
       const imagemUrl = url;
 
       const { nome, sobre, valor, categoria, estoque } = form;
-      await fetch("https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos", {
+      await fetch("https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

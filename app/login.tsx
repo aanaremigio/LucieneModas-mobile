@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -10,19 +10,21 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     if (email.trim() === '') {
-      alert('Por favor, insira seu e-mail');
+      Alert.alert('Atenção', 'Por favor, insira seu e-mail');
       return;
     }
-    // adicionar lógica para autenticação via e-mail
-    router.push('/home');
+
+    if (email.trim().toLowerCase() === 'luciene.modas@gmail.com') {
+      router.push('/home');
+    } else {
+      Alert.alert('Acesso negado', 'E-mail incorreto.');
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Parte superior com círculo */}
-      <View style={styles.topCircle}>
-        <Text style={styles.welcomeText}></Text>
-      </View>
+      <View style={styles.topCircle} />
 
       {/* Parte inferior rosa com campo de e-mail */}
       <View style={styles.formContainer}>
@@ -55,15 +57,6 @@ const styles = StyleSheet.create({
     borderRadius: (width * 0.7) / 2,
     backgroundColor: '#8A1B58',
     marginTop: height * 0.08,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: height * 0.05,
-  },
-  welcomeText: {
-    fontSize: width * 0.06,
-    color: '#E2B24D',
-    fontWeight: 'bold',
-    transform: [{ rotate: '-15deg' }]
   },
   formContainer: {
     backgroundColor: '#8A1B58',
@@ -94,4 +87,3 @@ const styles = StyleSheet.create({
     color: '#8A1B58'
   },
 });
-

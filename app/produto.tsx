@@ -10,7 +10,7 @@ export default function Produto() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${params.id}`, {
+      const response = await fetch(`https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos/${params.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -57,6 +57,11 @@ export default function Produto() {
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Text style={styles.deleteText}>Deletar Produto</Text>
         </TouchableOpacity>
+
+        {/* Mensagem de estoque esgotado */}
+        {params.estoque === '0' && (
+          <Text style={styles.warningText}>⚠ O produto está esgotado, recomendo que apague!</Text>
+        )}
       </ScrollView>
 
       <Footer />
@@ -122,5 +127,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: fontScale(16),
     fontWeight: 'bold',
+  },
+  warningText: {
+    marginTop: verticalScale(8),
+    color: '#F5B600',
+    fontSize: fontScale(14),
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
