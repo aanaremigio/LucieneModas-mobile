@@ -3,6 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -45,62 +46,6 @@ export default function ProdutosForm() {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!form.imagem || !form.nome || !form.valor || !form.categoria) {
-      return Alert.alert("Erro!", "Preencha todos os campos obrigatórios.");
-    }
-
-    try {
-      const formData = new FormData();
-      if (form.imagem) {
-        formData.append("file", {
-          uri: form.imagem.uri,
-          name: `photo-${Date.now()}.jpg`,
-          type: "image/jpeg",
-        } as any);
-      }
-
-      const uploadRes = await fetch("https://f9nkf6h4-3000.brs.devtunnels.ms/api/upload", {
-        method: "POST",
-        body: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      const { url } = await uploadRes.json();
-      const imagemUrl = url;
-
-      const { nome, sobre, valor, categoria, estoque } = form;
-      await fetch("https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome,
-          sobre,
-          valor: parseFloat(valor),
-          categoria,
-          imagemUrl,
-          estoque: estoque ? parseInt(estoque) : 0,
-        }),
-      });
-
-      Alert.alert("Sucesso!", "Produto adicionado com sucesso!");
-
-      setForm({
-        nome: "",
-        sobre: "",
-        valor: "",
-        categoria: "",
-        imagem: null,
-        estoque: "",
-      });
-      setCategoriaSelecionada('Outros');
-
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Erro!", "Não foi possível adicionar o produto.");
-    }
-  };
-
   const onSelectCategoria = (categoria: string) => {
     setCategoriaSelecionada(categoria);
     setForm({ ...form, categoria });
@@ -123,7 +68,12 @@ export default function ProdutosForm() {
 
           <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
             {form.imagem ? (
-              <Text style={{ color: '#000' }}>Imagem Selecionada</Text>
+              <>
+                <Image source={{ uri: form.imagem.uri }} style={styles.previewImage} />
+                <View style={styles.overlay}>
+                  <Text style={styles.overlayText}>Imagem Selecionada</Text>
+                </View>
+              </>
             ) : (
               <MaterialIcons name="add" size={48} color="#fff" />
             )}
@@ -187,7 +137,7 @@ export default function ProdutosForm() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.salvarBtn} onPress={handleSubmit}>
+          <TouchableOpacity style={styles.salvarBtn}>
             <Text style={styles.salvarText}>Salvar</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -214,7 +164,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   imageBox: {
-    height: 120,
+    height: 250,
     backgroundColor: '#EFDDBB',
     borderRadius: 10,
     justifyContent: 'center',
@@ -222,6 +172,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     width: '90%',
     maxWidth: 400,
+    overflow: "hidden",
+  },
+  previewImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(100,100,100,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlayText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
   },
   input: {
     backgroundColor: '#EFDDBB',
@@ -297,4 +264,3 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
- 
