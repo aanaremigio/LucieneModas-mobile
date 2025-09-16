@@ -13,7 +13,7 @@ export default function ProdutosList() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://f9nkf6h4-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch('https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos');
 
         if (!response.ok) {
           throw new Error(`Erro na resposta da API: ${response.status}`);

@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -17,7 +18,16 @@ import {
 import Footer from '../components/footer';
 import Header from '../components/header';
 
+type ParamType = string | string[] | undefined;
+
+function getParamString(param: ParamType): string {
+  return typeof param === "string" ? param : "";
+}
+
 export default function ProdutosForm() {
+  const params = useLocalSearchParams();
+  const isEdit = !!params.id;
+
   const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosmeticos'];
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Outros');
   const [form, setForm] = useState({
@@ -28,6 +38,28 @@ export default function ProdutosForm() {
     imagem: null as ImagePicker.ImagePickerAsset | null,
     estoque: "",
   });
+
+  useEffect(() => {
+    if (isEdit) {
+      const nome = getParamString(params.nome);
+      const sobre = getParamString(params.sobre);
+      const valor = getParamString(params.valor);
+      const categoria = getParamString(params.categoria);
+      const estoque = getParamString(params.estoque);
+      const imagem = getParamString(params.imagem);
+
+      setForm({
+        nome,
+        sobre,
+        valor,
+        categoria,
+        estoque,
+        imagem: imagem ? { uri: imagem } as ImagePicker.ImagePickerAsset : null,
+      });
+
+      setCategoriaSelecionada(categoria || 'Outros');
+    }
+  }, [isEdit]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -43,6 +75,69 @@ export default function ProdutosForm() {
 
     if (!result.canceled) {
       setForm({ ...form, imagem: result.assets[0] });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.nome || !form.valor || !form.categoria) {
+      return Alert.alert("Erro!", "Preencha todos os campos obrigatórios.");
+    }
+
+    try {
+      let imagemUrl = getParamString(params.imagem);
+
+      if (form.imagem && form.imagem.uri !== imagemUrl) {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: form.imagem.uri,
+          name: `photo-${Date.now()}.jpg`,
+          type: "image/jpeg",
+        } as any);
+
+        const uploadRes = await fetch(
+          "https://0j59qgbr-3000.brs.devtunnels.ms/api/upload",
+          {
+            method: "POST",
+            body: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        if (!uploadRes.ok) throw new Error("Erro ao enviar imagem");
+        const data = await uploadRes.json();
+        imagemUrl = data.url;
+      }
+
+      const body = {
+        nome: form.nome,
+        sobre: form.sobre,
+        valor: parseFloat(form.valor),
+        categoria: form.categoria,
+        estoque: form.estoque ? parseInt(form.estoque) : 0,
+        imagemUrl,
+      };
+
+      const url = isEdit
+        ? `https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${params.id}`
+        : "https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos";
+
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) throw new Error("Erro ao salvar produto");
+
+      Alert.alert("Sucesso!", isEdit ? "Produto atualizado!" : "Produto adicionado!");
+      setForm({ nome: "", sobre: "", valor: "", categoria: "", imagem: null, estoque: "" });
+      setCategoriaSelecionada("Outros");
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro!", "Não foi possível salvar o produto.");
     }
   };
 
@@ -64,7 +159,7 @@ export default function ProdutosForm() {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Adicionar</Text>
+          <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
 
           <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
             {form.imagem ? (
@@ -137,8 +232,8 @@ export default function ProdutosForm() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.salvarBtn}>
-            <Text style={styles.salvarText}>Salvar</Text>
+          <TouchableOpacity style={styles.salvarBtn} onPress={handleSubmit}>
+            <Text style={styles.salvarText}>{isEdit ? "Atualizar" : "Salvar"}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
