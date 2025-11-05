@@ -95,7 +95,7 @@ export default function ProdutosForm() {
         } as any);
 
         const uploadRes = await fetch(
-          "https://0j59qgbr-3000.brs.devtunnels.ms/api/upload",
+          "https://8gl74nbt-3000.brs.devtunnels.ms/api/upload",
           {
             method: "POST",
             body: formData,
@@ -118,8 +118,8 @@ export default function ProdutosForm() {
       };
 
       const url = isEdit
-        ? `https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${params.id}`
-        : "https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos";
+        ? `https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${params.id}`
+        : "https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos";
 
       const method = isEdit ? "PUT" : "POST";
 

@@ -22,7 +22,7 @@ export default function CosmeticosScreen() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch('https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos');
         const data = await response.json();
 
         const cosmeticos = data.filter(

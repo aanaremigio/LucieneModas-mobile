@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { View, Image, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 
-const logotipo2 = require('../assets/images/logotipo2.png'); // Logo redonda
-const logotipo3 = require('../assets/images/logotipo3.png'); // Nome
+const logotipo2 = require('../assets/images/logotipo2.png'); 
+const logotipo3 = require('../assets/images/logotipo3.png'); 
 
 export default function AberturaScreen() {
   const router = useRouter();

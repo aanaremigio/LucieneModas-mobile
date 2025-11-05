@@ -41,7 +41,7 @@ export default function Produto() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `https://0j59qgbr-3000.brs.devtunnels.ms/api/produtos/${params.id}`,
+        `https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${params.id}`,
         {
           method: "DELETE",
           headers: {
