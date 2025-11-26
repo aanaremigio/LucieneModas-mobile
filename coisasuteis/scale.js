@@ -1,4 +1,3 @@
-// coisasuteis/scale.js
 import { Dimensions, PixelRatio } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
