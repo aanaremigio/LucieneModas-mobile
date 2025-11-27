@@ -4,7 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 
+import Constants from "expo-constants";
+
 export default function ProdutosList() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +17,7 @@ export default function ProdutosList() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch(`${apiUrl}/api/produtos`);
 
         if (!response.ok) {
           throw new Error(`Erro na resposta da API: ${response.status}`);

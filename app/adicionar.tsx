@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -24,27 +25,45 @@ function getParamString(param: ParamType): string {
   return typeof param === "string" ? param : "";
 }
 
+// Função para remover acentos e colocar tudo minúsculo
+function normalizar(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 export default function ProdutosForm() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+
   const params = useLocalSearchParams();
   const isEdit = !!params.id;
 
-  const categorias = ['Masculino', 'Feminino', 'Outros', 'Infantil', 'Cosmeticos'];
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState('Outros');
+  // Categorias definidas
+  const categorias = ["Roupas", "Cosmeticos", "Outros"];
+  const subcategorias = ["Masculino", "Feminino", "Infantil", "Outros"];
+
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState("Outros");
+  const [subcategoriaSelecionada, setSubcategoriaSelecionada] = useState("Outros");
+
   const [form, setForm] = useState({
     nome: "",
     sobre: "",
     valor: "",
     categoria: "",
+    subcategoria: "",
     imagem: null as ImagePicker.ImagePickerAsset | null,
     estoque: "",
   });
 
+  // Carregar dados se for edição
   useEffect(() => {
     if (isEdit) {
       const nome = getParamString(params.nome);
       const sobre = getParamString(params.sobre);
       const valor = getParamString(params.valor);
       const categoria = getParamString(params.categoria);
+      const subcategoria = getParamString(params.subcategoria);
       const estoque = getParamString(params.estoque);
       const imagem = getParamString(params.imagem);
 
@@ -53,14 +72,29 @@ export default function ProdutosForm() {
         sobre,
         valor,
         categoria,
+        subcategoria,
         estoque,
         imagem: imagem ? { uri: imagem } as ImagePicker.ImagePickerAsset : null,
       });
 
-      setCategoriaSelecionada(categoria || 'Outros');
+      setCategoriaSelecionada(categoria || "Outros");
+      setSubcategoriaSelecionada(subcategoria || "Outros");
     }
   }, [isEdit]);
 
+  // Seleção de categoria
+  const onSelectCategoria = (cat: string) => {
+    setCategoriaSelecionada(cat);
+    setForm({ ...form, categoria: normalizar(cat) });
+  };
+
+  // Seleção de subcategoria
+  const onSelectSubcategoria = (sub: string) => {
+    setSubcategoriaSelecionada(sub);
+    setForm({ ...form, subcategoria: normalizar(sub) });
+  };
+
+  // Seleção de imagem
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -69,7 +103,7 @@ export default function ProdutosForm() {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
+      mediaTypes: "images",
       quality: 1,
     });
 
@@ -78,8 +112,9 @@ export default function ProdutosForm() {
     }
   };
 
+  // Enviar dados
   const handleSubmit = async () => {
-    if (!form.nome || !form.valor || !form.categoria) {
+    if (!form.nome || !form.valor || !form.categoria || !form.subcategoria) {
       return Alert.alert("Erro!", "Preencha todos os campos obrigatórios.");
     }
 
@@ -95,7 +130,7 @@ export default function ProdutosForm() {
         } as any);
 
         const uploadRes = await fetch(
-          "https://8gl74nbt-3000.brs.devtunnels.ms/api/upload",
+          `${apiUrl}/api/upload`,
           {
             method: "POST",
             body: formData,
@@ -113,13 +148,14 @@ export default function ProdutosForm() {
         sobre: form.sobre,
         valor: parseFloat(form.valor),
         categoria: form.categoria,
+        subcategoria: form.subcategoria,
         estoque: form.estoque ? parseInt(form.estoque) : 0,
         imagemUrl,
       };
 
       const url = isEdit
-        ? `https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${params.id}`
-        : "https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos";
+        ? `${apiUrl}/api/produtos/${params.id}`
+        : `${apiUrl}/api/produtos`;
 
       const method = isEdit ? "PUT" : "POST";
 
@@ -132,18 +168,24 @@ export default function ProdutosForm() {
       if (!res.ok) throw new Error("Erro ao salvar produto");
 
       Alert.alert("Sucesso!", isEdit ? "Produto atualizado!" : "Produto adicionado!");
-      setForm({ nome: "", sobre: "", valor: "", categoria: "", imagem: null, estoque: "" });
+
+      setForm({
+        nome: "",
+        sobre: "",
+        valor: "",
+        categoria: "",
+        subcategoria: "",
+        imagem: null,
+        estoque: "",
+      });
+
       setCategoriaSelecionada("Outros");
+      setSubcategoriaSelecionada("Outros");
 
     } catch (error) {
       console.error(error);
       Alert.alert("Erro!", "Não foi possível salvar o produto.");
     }
-  };
-
-  const onSelectCategoria = (categoria: string) => {
-    setCategoriaSelecionada(categoria);
-    setForm({ ...form, categoria });
   };
 
   return (
@@ -155,10 +197,7 @@ export default function ProdutosForm() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={100}
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
 
           <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
@@ -211,23 +250,46 @@ export default function ProdutosForm() {
             onChangeText={(text) => setForm({ ...form, sobre: text })}
           />
 
-          <Text style={styles.label}>Categorias</Text>
-          {categorias.map((categoria) => (
+          {/* CATEGORIA */}
+          <Text style={styles.label}>Categoria</Text>
+          {categorias.map((cat) => (
             <TouchableOpacity
-              key={categoria}
+              key={cat}
               style={[
                 styles.categoriaBtn,
-                categoriaSelecionada === categoria && styles.categoriaSelecionada,
+                categoriaSelecionada === cat && styles.categoriaSelecionada,
               ]}
-              onPress={() => onSelectCategoria(categoria)}
+              onPress={() => onSelectCategoria(cat)}
             >
               <Text
                 style={[
                   styles.categoriaText,
-                  categoriaSelecionada === categoria && { color: '#fff' },
+                  categoriaSelecionada === cat && { color: "#fff" },
                 ]}
               >
-                {categoria}
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          {/* SUBCATEGORIA */}
+          <Text style={styles.label}>Subcategoria</Text>
+          {subcategorias.map((sub) => (
+            <TouchableOpacity
+              key={sub}
+              style={[
+                styles.categoriaBtn,
+                subcategoriaSelecionada === sub && styles.categoriaSelecionada,
+              ]}
+              onPress={() => onSelectSubcategoria(sub)}
+            >
+              <Text
+                style={[
+                  styles.categoriaText,
+                  subcategoriaSelecionada === sub && { color: "#fff" },
+                ]}
+              >
+                {sub}
               </Text>
             </TouchableOpacity>
           ))}
@@ -247,36 +309,32 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
     paddingBottom: 100,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 22,
+    marginVertical: 20,
     color: '#8A1B58',
     fontWeight: 'bold',
-    marginVertical: 20,
-    alignSelf: 'center',
   },
   imageBox: {
     height: 250,
+    width: '90%',
     backgroundColor: '#EFDDBB',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    width: '90%',
-    maxWidth: 400,
     overflow: "hidden",
+    marginBottom: 15,
   },
   previewImage: {
     width: "100%",
     height: "100%",
-    resizeMode: "cover",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(100,100,100,0.4)",
+    backgroundColor: "rgba(50,50,50,0.4)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -286,76 +344,68 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   input: {
+    width: '90%',
     backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
-    width: '90%',
-    maxWidth: 400,
     color: '#000',
   },
   row: {
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '90%',
-    maxWidth: 400,
     marginBottom: 10,
   },
   inputHalf: {
+    width: '48%',
     backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
-    width: '48%',
     color: '#000',
   },
   textArea: {
+    width: '90%',
+    height: 100,
     backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
-    height: 100,
-    textAlignVertical: 'top',
     marginBottom: 15,
-    width: '90%',
-    maxWidth: 400,
+    textAlignVertical: 'top',
     color: '#000',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
     alignSelf: 'flex-start',
     width: '90%',
-    maxWidth: 400,
   },
   categoriaBtn: {
+    width: '90%',
     backgroundColor: '#EFDDBB',
     padding: 10,
     borderRadius: 8,
     marginVertical: 3,
-    width: '90%',
-    maxWidth: 400,
   },
   categoriaSelecionada: {
     backgroundColor: '#8A1B58',
   },
   categoriaText: {
-    color: '#000000ff',
     textAlign: 'center',
+    color: '#000',
   },
   salvarBtn: {
+    width: '90%',
     backgroundColor: 'white',
     borderColor: '#8A1B58',
     borderWidth: 3,
-    padding: 10,
-    borderRadius: 4,
-    alignSelf: 'center',
-    marginTop: 14,
-    width: '90%',
-    maxWidth: 400,
+    padding: 12,
+    borderRadius: 5,
+    marginTop: 20,
   },
   salvarText: {
+    textAlign: 'center',
     color: '#8A1B58',
     fontWeight: 'bold',
-    alignSelf: 'center',
   },
 });

@@ -14,7 +14,11 @@ import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
+import Constants from "expo-constants";
+
 export default function MasculinoScreen() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter(); // ✅ Inicializa o roteador
@@ -22,10 +26,10 @@ export default function MasculinoScreen() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch(`${apiUrl}/api/produtos`);
         const data = await response.json();
 
-        const masculino = data.filter((p: any) => p.categoria === 'Masculino');
+        const masculino = data.filter((p: any) => p.subcategoria === 'masculino');
         setProdutos(masculino);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);

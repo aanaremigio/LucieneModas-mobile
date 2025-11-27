@@ -19,7 +19,11 @@ import {
 import Footer from "../components/footer";
 import Header from "../components/header";
 
+import Constants from "expo-constants";
+
 export default function Produto() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const params = useLocalSearchParams();
   const router = useRouter();
 
@@ -41,7 +45,7 @@ export default function Produto() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${params.id}`,
+        `${apiUrl}/api/produtos/${params.id}`,
         {
           method: "DELETE",
           headers: {

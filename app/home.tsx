@@ -7,15 +7,20 @@ import Footer from '../components/footer';
 import { scale, verticalScale, moderateScale, fontScale } from '../coisasuteis/scale';
 import ProdutosList from '@/components/produtosList';
 
+import Constants from "expo-constants";
 
 export default function HomeScreen() {
- 
+  
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+
   const router = useRouter();
 
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
+
+      <Text>{apiUrl}</Text>
 
       <Text style={styles.sectionTitle}>Funcionalidades</Text>
       <View style={styles.featureContainer}>

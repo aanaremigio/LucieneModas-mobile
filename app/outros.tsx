@@ -14,7 +14,11 @@ import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
+import Constants from "expo-constants";
+
 export default function OutrosScreen() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter(); // ✅ Instancia o roteador
@@ -22,10 +26,10 @@ export default function OutrosScreen() {
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await fetch('https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos');
+        const response = await fetch(`${apiUrl}/api/produtos`);
         const data = await response.json();
 
-        const outros = data.filter((p: any) => p.categoria === 'Outros');
+        const outros = data.filter((p: any) => p.categoria === 'outros' || p.subcategoria === 'outros');
         setProdutos(outros);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);

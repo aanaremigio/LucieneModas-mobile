@@ -11,14 +11,18 @@ import {
 import Footer from '../components/footer';
 import Header from '../components/header';
 
+import Constants from "expo-constants";
+
 export default function AnaliseScreen() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const [produtos, setProdutos] = useState<any[]>([]);
   const [acabouNoEstoque, setAcabouNoEstoque] = useState(0);
 
   // Função para buscar produtos e atualizar estoque esgotado
   const fetchProdutos = async () => {
     try {
-      const response = await fetch('https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos');
+      const response = await fetch(`${apiUrl}/api/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos');
       const data = await response.json();
       setProdutos(data);
@@ -42,7 +46,7 @@ export default function AnaliseScreen() {
       const produto = produtos.find(p => p.id === produtoId);
       if (!produto) return;
 
-      const response = await fetch(`https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${produtoId}`, {
+      const response = await fetch(`${apiUrl}/api/produtos/${produtoId}`, {
         method: 'DELETE',
         body: JSON.stringify({ url: produto.imagem }),
         headers: { 'Content-Type': 'application/json' },

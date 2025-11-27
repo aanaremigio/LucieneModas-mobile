@@ -15,7 +15,11 @@ import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
+import Constants from "expo-constants";
+
 export default function RemoverScreen() {
+  const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+  
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [produtos, setProdutos] = useState<any[]>([]);
@@ -25,7 +29,7 @@ export default function RemoverScreen() {
   const fetchProdutos = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos");
+      const response = await fetch(`${apiUrl}/api/produtos`);
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const data = await response.json();
       setProdutos(data);
@@ -50,7 +54,7 @@ export default function RemoverScreen() {
   const deleteSelected = async () => {
     try {
       for (const item of selectedItems) {
-        const response = await fetch(`https://8gl74nbt-3000.brs.devtunnels.ms/api/produtos/${item.id}`, {
+        const response = await fetch(`${apiUrl}/api/produtos/${item.id}`, {
           method: "DELETE",
           body: JSON.stringify({ url: item.imagem }),
           headers: { "Content-Type": "application/json" },

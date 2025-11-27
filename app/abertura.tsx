@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Image, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 
 const logotipo2 = require('../assets/images/logotipo2.png'); 
 const logotipo3 = require('../assets/images/logotipo3.png'); 
@@ -26,7 +26,8 @@ export default function AberturaScreen() {
     ]).start();
 
     const timer = setTimeout(() => {
-      router.replace('/login');
+      // router.replace('/login');
+      router.replace('/home');
     }, 5000);
 
     return () => clearTimeout(timer);
