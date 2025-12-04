@@ -24,6 +24,7 @@ export default function RemoverScreen() {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   const fetchProdutos = async () => {
@@ -46,13 +47,21 @@ export default function RemoverScreen() {
   }, []);
 
   const toggleSelection = (item: any) => {
+    if (deleting) return;
     setSelectedItems(prev =>
       prev.find((el) => el.id == item.id) ? prev.filter(el => el.id !== item.id) : [...prev, item]
     );
   };
 
   const deleteSelected = async () => {
+    if (selectedItems.length === 0) {
+      Alert.alert("Atenção", "Selecione pelo menos um produto para excluir.");
+      return;
+    }
+
     try {
+      setDeleting(true);
+      
       for (const item of selectedItems) {
         const response = await fetch(`${apiUrl}/api/produtos/${item.id}`, {
           method: "DELETE",
@@ -61,17 +70,31 @@ export default function RemoverScreen() {
         });
         if (!response.ok) throw new Error(`Erro ao deletar produto ${item.id}`);
       }
+      
       Alert.alert("Sucesso", "Produtos removidos com sucesso!");
       setSelectedItems([]);
+      setIsSelectionMode(false);
       fetchProdutos();
+      
     } catch (err) {
       console.error(err);
       Alert.alert("Erro", "Não foi possível apagar os produtos.");
+    } finally {
+      setDeleting(false);
     }
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#8A1B58" style={{ marginTop: 40 }} />;
+    return (
+      <View style={{ flex: 1 }}>
+        <Header />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8A1B58" />
+          <Text style={styles.loadingText}>Carregando produtos...</Text>
+        </View>
+        <Footer />
+      </View>
+    );
   }
 
   return (
@@ -81,13 +104,37 @@ export default function RemoverScreen() {
         <View style={styles.headerContainer}>
           <Text style={styles.title}>Remover</Text>
           <TouchableOpacity
-            onPress={() => setIsSelectionMode(prev => !prev)}
-            style={styles.trashButton}
+            onPress={() => {
+              if (!deleting) {
+                setIsSelectionMode(prev => !prev);
+                if (isSelectionMode) setSelectedItems([]);
+              }
+            }}
+            style={[styles.trashButton, deleting && styles.trashButtonDisabled]}
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            disabled={deleting}
           >
-            <MaterialIcons name="delete" size={40} color="#000" />
+            <MaterialIcons 
+              name={isSelectionMode ? "cancel" : "delete"} 
+              size={40} 
+              color={deleting ? "#999" : "#000"} 
+            />
           </TouchableOpacity>
         </View>
+
+        <Text style={styles.instruction}>
+          {isSelectionMode 
+            ? `Selecione os produtos para excluir (${selectedItems.length} selecionados)`
+            : "Clique em um produto para ver detalhes ou no ícone 🗑 para selecionar múltiplos"}
+        </Text>
+
+        {isSelectionMode && selectedItems.length > 0 && (
+          <View style={styles.selectionInfo}>
+            <Text style={styles.selectionText}>
+              {selectedItems.length} produto{selectedItems.length !== 1 ? 's' : ''} selecionado{selectedItems.length !== 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.productGrid}>
           {produtos.map(item => (
@@ -105,6 +152,7 @@ export default function RemoverScreen() {
                   router.push({ pathname: '/produto', params: { ...item } });
                 }
               }}
+              disabled={deleting}
             >
               <View style={{ width: '100%', height: '70%' }}>
                 {item.imagem ? (
@@ -112,10 +160,25 @@ export default function RemoverScreen() {
                 ) : (
                   <Ionicons name="shirt-outline" size={40} color="#555" />
                 )}
+                
                 {/* Ícone de alerta se estoque = 0 */}
                 {item.estoque === 0 && (
                   <View style={styles.warningIcon}>
                     <MaterialIcons name="error" size={22} color="#F5B600" />
+                  </View>
+                )}
+                
+                {/* Ícone de seleção */}
+                {isSelectionMode && (
+                  <View style={[
+                    styles.selectionIcon,
+                    selectedItems.find(el => el.id == item.id) && styles.selectionIconSelected
+                  ]}>
+                    <MaterialIcons 
+                      name={selectedItems.find(el => el.id == item.id) ? "check-box" : "check-box-outline-blank"} 
+                      size={20} 
+                      color={selectedItems.find(el => el.id == item.id) ? "#8A1B58" : "#999"} 
+                    />
                   </View>
                 )}
               </View>
@@ -126,12 +189,19 @@ export default function RemoverScreen() {
           ))}
         </View>
 
-        {isSelectionMode && (
+        {isSelectionMode && selectedItems.length > 0 && (
           <TouchableOpacity
-            style={styles.deleteButton}
+            style={[styles.deleteButton, deleting && styles.deleteButtonDisabled]}
             onPress={deleteSelected}
+            disabled={deleting}
           >
-            <Text style={styles.deleteButtonText}>Apagar para sempre</Text>
+            {deleting ? (
+              <ActivityIndicator size="small" color="#8A1B58" />
+            ) : (
+              <Text style={styles.deleteButtonText}>
+                Apagar {selectedItems.length} produto{selectedItems.length !== 1 ? 's' : ''}
+              </Text>
+            )}
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -141,6 +211,17 @@ export default function RemoverScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#8A1B58',
+  },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -159,6 +240,17 @@ const styles = StyleSheet.create({
     top: 40,
     zIndex: 10,
   },
+  trashButtonDisabled: {
+    opacity: 0.5,
+  },
+  instruction: {
+    textAlign: 'center',
+    color: '#666',
+    fontSize: 14,
+    marginTop: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 120,
@@ -169,7 +261,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: scale(10),
     paddingBottom: verticalScale(80),
-    marginTop: 50,
+    marginTop: 20,
   },
   productCard: {
     alignItems: 'center',
@@ -179,6 +271,7 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(10),
     width: '30%',
     height: verticalScale(180),
+    position: 'relative',
   },
   productImage: {
     width: '100%',
@@ -207,26 +300,49 @@ const styles = StyleSheet.create({
     padding: 2,
     elevation: 3,
   },
-  checkbox: {
+  selectionIcon: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 5,
+    left: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 4,
+    padding: 2,
+  },
+  selectionIconSelected: {
+    backgroundColor: 'rgba(138, 27, 88, 0.1)',
+  },
+  selectionInfo: {
+    backgroundColor: '#EFDDBB',
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  selectionText: {
+    color: '#8A1B58',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   deleteButton: {
-    alignSelf: 'flex-end',
-    marginRight: 20,
-    marginTop: 15,
-    marginBottom: 20,
+    alignSelf: 'center',
     backgroundColor: '#fff',
     borderColor: '#8A1B58',
     borderWidth: 2,
-    paddingVertical: 10,
-    paddingHorizontal: 22,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
     borderRadius: 8,
+    marginTop: 20,
+    marginBottom: 30,
+    minWidth: 200,
+    alignItems: 'center',
+  },
+  deleteButtonDisabled: {
+    opacity: 0.6,
   },
   deleteButtonText: {
     color: '#8A1B58',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
   },
 });

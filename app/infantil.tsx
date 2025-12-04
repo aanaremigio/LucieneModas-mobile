@@ -1,14 +1,14 @@
 import { useRouter } from 'expo-router'; // Import necessário para navegação
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';

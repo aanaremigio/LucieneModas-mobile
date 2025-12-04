@@ -1,81 +1,133 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useState } from "react";
 import {
-  Alert,
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
   Image,
-} from 'react-native';
+} from "react-native";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 
-import * as Google from 'expo-auth-session/providers/google';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
 
-import { auth } from '../firebaseConfig';
-
-const { width, height } = Dimensions.get('window');
-
-export default function LoginScreen() {
+export default function Login() {
   const router = useRouter();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: '398743093465-ef19fkuhu277v1kg4t4n204t5rp48c28.apps.googleusercontent.com',
-    selectAccount: true,
-  });
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-
-      signInWithCredential(auth, credential)
-        .then(async (result) => {
-          const user = result.user;
-
-          if (user.email !== 'lucienem0d4s@gmail.com') {
-            Alert.alert('Acesso negado', 'Esta conta Google não tem permissão.');
-            return;
-          }
-
-          await AsyncStorage.setItem('@user', JSON.stringify(user));
-
-          router.replace('/home');
-        })
-        .catch(() => {
-          Alert.alert('Erro', 'Falha ao autenticar com o Google.');
-        });
+  async function loginEmailSenha() {
+    if (!email || !senha) {
+      return Alert.alert("Erro", "Preencha email e senha.");
     }
-  }, [response]);
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setLoading(false);
+        return Alert.alert("Erro", data.mensagem || "Credenciais inválidas.");
+      }
+
+      // SALVAR USUÁRIO LOCALMENTE
+      await AsyncStorage.setItem("@user", JSON.stringify(data.usuario));
+
+      setLoading(false);
+
+      // REDIRECIONAR APÓS LOGIN
+      router.replace("/home");
+    } catch (error) {
+      console.log("Erro ao autenticar:", error);
+      setLoading(false);
+      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+    }
+  }
+
+  // async function loginGoogle() {
+  //   try {
+  //     const authRequest = new GoogleAuthProvider();
+  //     const result = await signInWithPopup(auth, authRequest);
+  //
+  //     const userData = {
+  //       nome: result.user.displayName,
+  //       email: result.user.email,
+  //       foto: result.user.photoURL,
+  //     };
+  //
+  //     await AsyncStorage.setItem("@user", JSON.stringify(userData));
+  //
+  //     router.replace("/home");
+  //   } catch (error) {
+  //     console.log(error);
+  //     Alert.alert("Erro", "Não foi possível fazer login com Google.");
+  //   }
+  // }
 
   return (
     <View style={styles.container}>
-      <View style={styles.topCircle} />
+      <Image
+        source={require("../../assets/images/logo.png")}
+        style={styles.logo}
+      />
 
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Bem-vinda</Text>
-        <Text style={styles.subtitle}>Entre com sua conta Google autorizada</Text>
+      <Text style={styles.titulo}>Bem-vindo</Text>
 
-        {/* Botão Google */}
-        <TouchableOpacity
-          style={styles.googleButton}
-          onPress={() => promptAsync()}
-          disabled={!request}
-        >
-          <Image
-            source={{
-              uri: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png',
-            }}
-            style={styles.googleLogo}
-          />
+      <TextInput
+        placeholder="Email"
+        placeholderTextColor="#999"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
 
-          <Text style={styles.googleButtonText}>
-            Entrar com Google
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TextInput
+        placeholder="Senha"
+        placeholderTextColor="#999"
+        style={styles.input}
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+      />
+
+      <TouchableOpacity
+        style={styles.botao}
+        onPress={loginEmailSenha}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text style={styles.botaoTexto}>Entrar</Text>
+        )}
+      </TouchableOpacity>
+
+      {/* BOTÃO GOOGLE (deixado exatamente como estava) */}
+
+      {/* 
+      <TouchableOpacity style={styles.googleBotao} onPress={loginGoogle}>
+        <Image source={require("../../assets/images/google.png")} style={styles.googleIcon} />
+        <Text style={styles.googleTexto}>Entrar com Google</Text>
+      </TouchableOpacity>
+      */}
+
+      <TouchableOpacity onPress={() => router.push("/register")}>
+        <Text style={styles.link}>Criar conta</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -83,64 +135,70 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center'
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
   },
-  topCircle: {
-    width: width * 0.7,
-    height: width * 0.7,
-    borderRadius: (width * 0.7) / 2,
-    backgroundColor: '#8A1B58',
-    marginTop: height * 0.08,
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
+    resizeMode: "contain",
   },
-  formContainer: {
-    backgroundColor: '#8A1B58',
-    width: '100%',
-    flex: 1,
-    borderTopLeftRadius: width * 0.25,
-    borderTopRightRadius: width * 0.25,
-    paddingTop: height * 0.06,
-    paddingHorizontal: width * 0.12,
-    marginTop: height * 0.08,
-    alignItems: 'center'
+  titulo: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
   },
-  title: {
-    fontSize: width * 0.07,
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 5,
+  input: {
+    width: "100%",
+    height: 48,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 8,
+    paddingLeft: 12,
+    marginBottom: 15,
+    fontSize: 16,
   },
-  subtitle: {
-    fontSize: width * 0.045,
-    color: '#fff',
+  botao: {
+    width: "100%",
+    height: 48,
+    backgroundColor: "#000",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 30,
   },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: height * 0.02,
-    width: '100%',
-    borderRadius: 12,
-
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 5,
+  botaoTexto: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "600",
   },
-  googleLogo: {
-    width: 28,
-    height: 28,
-    marginLeft: 12,
-    marginRight: 15,
+  link: {
+    marginTop: 10,
+    color: "#007bff",
+    fontSize: 15,
   },
-  googleButtonText: {
-    flex: 1,
-    textAlign: 'center',
+  googleBotao: {
+    width: "100%",
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 25,
+    backgroundColor: "#fff",
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  googleTexto: {
     fontSize: 16,
-    color: '#444',
-    fontWeight: '600',
-    marginRight: 35,
+    color: "#555",
   },
 });

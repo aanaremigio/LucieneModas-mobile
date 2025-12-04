@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(25),
   },
   subtitle: {
-    color: '#FFD700',
+    color: '#dec533ff',
     fontSize: fontScale(20),
     marginTop: verticalScale(25),
     marginBottom: verticalScale(10),

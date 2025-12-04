@@ -1,7 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -27,8 +28,37 @@ export default function Produto() {
   const params = useLocalSearchParams();
   const router = useRouter();
 
-  const estoque = Number(params.estoque || 0);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const [produto, setProduto] = useState<any>(null);
+  
+  const estoque = produto ? Number(produto.estoque || 0) : 0;
   const [quantidade, setQuantidade] = useState(estoque > 0 ? 1 : 0);
+
+  // Carregar dados do produto
+  useEffect(() => {
+    if (params.id) {
+      carregarProduto();
+    }
+  }, [params.id]);
+
+  const carregarProduto = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${apiUrl}/api/produtos/${params.id}`);
+      
+      if (!response.ok) throw new Error("Erro ao carregar produto");
+      
+      const data = await response.json();
+      setProduto(data);
+      setQuantidade(data.estoque > 0 ? 1 : 0);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Não foi possível carregar os dados do produto.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const aumentarQuantidade = () => {
     if (quantidade < estoque) {
@@ -43,29 +73,82 @@ export default function Produto() {
   };
 
   const handleDelete = async () => {
-    try {
-      const response = await fetch(
-        `${apiUrl}/api/produtos/${params.id}`,
+    Alert.alert(
+      "Confirmar Exclusão",
+      `Deseja realmente excluir "${produto?.nome}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
         {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ url: params.imagem }),
-        }
-      );
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setDeleting(true);
+              const response = await fetch(
+                `${apiUrl}/api/produtos/${params.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ url: produto?.imagem }),
+                }
+              );
 
-      if (response.ok) {
-        Alert.alert("Sucesso", "Produto deletado com sucesso!");
-        router.back();
-      } else {
-        Alert.alert("Erro", "Não foi possível deletar o produto.");
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Erro", "Falha ao conectar com o servidor.");
-    }
+              if (response.ok) {
+                Alert.alert("Sucesso", "Produto deletado com sucesso!");
+                router.back();
+              } else {
+                Alert.alert("Erro", "Não foi possível deletar o produto.");
+              }
+            } catch (error) {
+              console.error(error);
+              Alert.alert("Erro", "Falha ao conectar com o servidor.");
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ]
+    );
   };
+
+  // Tela de loading
+  if (loading) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Header />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8A1B58" />
+          <Text style={styles.loadingText}>Carregando produto...</Text>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
+
+  // Se não encontrou o produto
+  if (!produto) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Header />
+        <View style={styles.errorContainer}>
+          <MaterialIcons name="error-outline" size={60} color="#FF3B30" />
+          <Text style={styles.errorTitle}>Produto não encontrado</Text>
+          <Text style={styles.errorText}>
+            O produto que você está tentando acessar não existe ou foi removido.
+          </Text>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Voltar</Text>
+          </TouchableOpacity>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -81,13 +164,14 @@ export default function Produto() {
               router.push({
                 pathname: "/adicionar",
                 params: {
-                  id: params.id,
-                  nome: params.nome,
-                  sobre: params.sobre,
-                  valor: params.valor,
-                  categoria: params.categoria,
-                  estoque: params.estoque,
-                  imagem: params.imagem,
+                  id: produto.id,
+                  nome: produto.nome,
+                  sobre: produto.sobre,
+                  valor: produto.valor,
+                  categoria: produto.categoria,
+                  subcategoria: produto.subcategoria,
+                  estoque: produto.estoque,
+                  imagem: produto.imagem,
                 },
               });
             }}
@@ -97,7 +181,7 @@ export default function Produto() {
 
           {/* Imagem centralizada */}
           <Image
-            source={{ uri: params.imagem as string }}
+            source={{ uri: produto.imagem }}
             style={styles.image}
             resizeMode="contain"
           />
@@ -109,11 +193,11 @@ export default function Produto() {
         {/* Categoria, Nome e Preço com Estoque */}
         <View style={styles.headerRow}>
           <View>
-            <Text style={styles.category}>{params.categoria}</Text>
-            <Text style={styles.title}>{params.nome}</Text>
+            <Text style={styles.category}>{produto.categoria} - {params.subcategoria}</Text>
+            <Text style={styles.title}>{produto.nome}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.price}>R$ {params.valor}</Text>
+            <Text style={styles.price}>R$ {produto.valor}</Text>
             <Text style={styles.stockLabel}>Estoque: {estoque}</Text>
           </View>
         </View>
@@ -121,7 +205,7 @@ export default function Produto() {
         {/* Descrição */}
         <Text style={styles.descriptionTitle}>Descrição</Text>
         <Text style={styles.description}>
-          {params.sobre || "Sem descrição disponível."}
+          {produto.sobre || "Sem descrição disponível."}
         </Text>
 
         {/* Controle de estoque */}
@@ -150,8 +234,16 @@ export default function Produto() {
         </View>
 
         {/* Botão deletar */}
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.deleteText}>Deletar Produto</Text>
+        <TouchableOpacity 
+          style={[styles.deleteButton, deleting && styles.deleteButtonDisabled]} 
+          onPress={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.deleteText}>Deletar Produto</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
 
@@ -166,6 +258,48 @@ const styles = StyleSheet.create({
     paddingTop: verticalScale(260),
     paddingBottom: verticalScale(80),
     backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#8A1B58',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FF3B30',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  backButton: {
+    backgroundColor: '#8A1B58',
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   topBackground: {
     position: "absolute",
@@ -280,6 +414,11 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(8),
     alignItems: "center",
     marginTop: verticalScale(10),
+    minHeight: 50,
+    justifyContent: 'center',
+  },
+  deleteButtonDisabled: {
+    opacity: 0.6,
   },
   deleteText: {
     color: "#fff",

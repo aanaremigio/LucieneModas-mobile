@@ -4,6 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
@@ -45,6 +46,8 @@ export default function ProdutosForm() {
 
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("Outros");
   const [subcategoriaSelecionada, setSubcategoriaSelecionada] = useState("Outros");
+  const [loading, setLoading] = useState(false);
+  const [loadingInicial, setLoadingInicial] = useState(isEdit); // Só carrega inicial se for edição
 
   const [form, setForm] = useState({
     nome: "",
@@ -59,28 +62,39 @@ export default function ProdutosForm() {
   // Carregar dados se for edição
   useEffect(() => {
     if (isEdit) {
-      const nome = getParamString(params.nome);
-      const sobre = getParamString(params.sobre);
-      const valor = getParamString(params.valor);
-      const categoria = getParamString(params.categoria);
-      const subcategoria = getParamString(params.subcategoria);
-      const estoque = getParamString(params.estoque);
-      const imagem = getParamString(params.imagem);
-
-      setForm({
-        nome,
-        sobre,
-        valor,
-        categoria,
-        subcategoria,
-        estoque,
-        imagem: imagem ? { uri: imagem } as ImagePicker.ImagePickerAsset : null,
-      });
-
-      setCategoriaSelecionada(categoria || "Outros");
-      setSubcategoriaSelecionada(subcategoria || "Outros");
+      carregarDadosProduto();
     }
   }, [isEdit]);
+
+  const carregarDadosProduto = async () => {
+    try {
+      setLoadingInicial(true);
+      const id = getParamString(params.id);
+      
+      const response = await fetch(`${apiUrl}/api/produtos/${id}`);
+      if (!response.ok) throw new Error("Erro ao carregar produto");
+      
+      const produto = await response.json();
+      
+      setForm({
+        nome: produto.nome || "",
+        sobre: produto.sobre || "",
+        valor: produto.valor ? produto.valor.toString() : "",
+        categoria: produto.categoria || "",
+        subcategoria: produto.subcategoria || "",
+        estoque: produto.estoque ? produto.estoque.toString() : "",
+        imagem: produto.imagem ? { uri: produto.imagem } as ImagePicker.ImagePickerAsset : null,
+      });
+
+      setCategoriaSelecionada(produto.categoria || "Outros");
+      setSubcategoriaSelecionada(produto.subcategoria || "Outros");
+    } catch (error) {
+      console.error("Erro ao carregar produto:", error);
+      Alert.alert("Erro", "Não foi possível carregar os dados do produto.");
+    } finally {
+      setLoadingInicial(false);
+    }
+  };
 
   // Seleção de categoria
   const onSelectCategoria = (cat: string) => {
@@ -119,6 +133,7 @@ export default function ProdutosForm() {
     }
 
     try {
+      setLoading(true);
       let imagemUrl = getParamString(params.imagem);
 
       if (form.imagem && form.imagem.uri !== imagemUrl) {
@@ -169,24 +184,43 @@ export default function ProdutosForm() {
 
       Alert.alert("Sucesso!", isEdit ? "Produto atualizado!" : "Produto adicionado!");
 
-      setForm({
-        nome: "",
-        sobre: "",
-        valor: "",
-        categoria: "",
-        subcategoria: "",
-        imagem: null,
-        estoque: "",
-      });
+      // Limpar formulário apenas se não for edição
+      if (!isEdit) {
+        setForm({
+          nome: "",
+          sobre: "",
+          valor: "",
+          categoria: "",
+          subcategoria: "",
+          imagem: null,
+          estoque: "",
+        });
 
-      setCategoriaSelecionada("Outros");
-      setSubcategoriaSelecionada("Outros");
+        setCategoriaSelecionada("Outros");
+        setSubcategoriaSelecionada("Outros");
+      }
 
     } catch (error) {
       console.error(error);
       Alert.alert("Erro!", "Não foi possível salvar o produto.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Se estiver carregando dados iniciais (edição)
+  if (loadingInicial) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8A1B58" />
+          <Text style={styles.loadingText}>Carregando produto...</Text>
+        </View>
+        <Footer />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -200,7 +234,11 @@ export default function ProdutosForm() {
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
 
-          <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
+          <TouchableOpacity 
+            style={styles.imageBox} 
+            onPress={pickImage}
+            disabled={loading}
+          >
             {form.imagem ? (
               <>
                 <Image source={{ uri: form.imagem.uri }} style={styles.previewImage} />
@@ -219,6 +257,7 @@ export default function ProdutosForm() {
             style={styles.input}
             value={form.nome}
             onChangeText={(text) => setForm({ ...form, nome: text })}
+            editable={!loading}
           />
 
           <View style={styles.row}>
@@ -229,6 +268,7 @@ export default function ProdutosForm() {
               keyboardType="numeric"
               value={form.valor}
               onChangeText={(text) => setForm({ ...form, valor: text })}
+              editable={!loading}
             />
 
             <TextInput
@@ -238,6 +278,7 @@ export default function ProdutosForm() {
               keyboardType="numeric"
               value={form.estoque}
               onChangeText={(text) => setForm({ ...form, estoque: text })}
+              editable={!loading}
             />
           </View>
 
@@ -248,6 +289,7 @@ export default function ProdutosForm() {
             style={styles.textArea}
             value={form.sobre}
             onChangeText={(text) => setForm({ ...form, sobre: text })}
+            editable={!loading}
           />
 
           {/* CATEGORIA */}
@@ -260,6 +302,7 @@ export default function ProdutosForm() {
                 categoriaSelecionada === cat && styles.categoriaSelecionada,
               ]}
               onPress={() => onSelectCategoria(cat)}
+              disabled={loading}
             >
               <Text
                 style={[
@@ -282,6 +325,7 @@ export default function ProdutosForm() {
                 subcategoriaSelecionada === sub && styles.categoriaSelecionada,
               ]}
               onPress={() => onSelectSubcategoria(sub)}
+              disabled={loading}
             >
               <Text
                 style={[
@@ -294,8 +338,16 @@ export default function ProdutosForm() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.salvarBtn} onPress={handleSubmit}>
-            <Text style={styles.salvarText}>{isEdit ? "Atualizar" : "Salvar"}</Text>
+          <TouchableOpacity 
+            style={[styles.salvarBtn, loading && styles.salvarBtnDisabled]} 
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#8A1B58" />
+            ) : (
+              <Text style={styles.salvarText}>{isEdit ? "Atualizar" : "Salvar"}</Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -317,6 +369,17 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     color: '#8A1B58',
     fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#8A1B58',
   },
   imageBox: {
     height: 250,
@@ -402,10 +465,17 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 5,
     marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 50,
+  },
+  salvarBtnDisabled: {
+    opacity: 0.6,
   },
   salvarText: {
     textAlign: 'center',
     color: '#8A1B58',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
