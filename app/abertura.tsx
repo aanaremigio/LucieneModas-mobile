@@ -1,9 +1,9 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef } from "react";
+import { Animated, StyleSheet, Text, View } from "react-native";
 
-const logotipo2 = require('../assets/images/logotipo2.png'); 
-const logotipo3 = require('../assets/images/logotipo3.png'); 
+const logotipo2 = require("../assets/images/logotipo2.png");
+const logotipo3 = require("../assets/images/logotipo3.png");
 
 export default function AberturaScreen() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function AberturaScreen() {
 
     const timer = setTimeout(() => {
       // router.replace('/login');
-      router.replace('/login');
+      router.replace("/home");
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -54,9 +54,9 @@ export default function AberturaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   logo: {
     width: 300,
@@ -68,15 +68,15 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   footer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 40,
     fontSize: 20,
-    color: '#8A1B58',
+    color: "#8A1B58",
   },
   footer2: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     fontSize: 18,
-    color: '#8A1B58',
+    color: "#8A1B58",
   },
 });
