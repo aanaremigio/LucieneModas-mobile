@@ -14,25 +14,31 @@ import {
 import { fontScale, moderateScale, scale, verticalScale } from '../coisasuteis/scale';
 import Footer from '../components/footer';
 import Header from '../components/header';
+import { pedidos } from '../dados/pedidosDados';  
 
 import Constants from "expo-constants";
 
 export default function HomeScreen() {
   const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
   const router = useRouter();
+
   const [refreshing, setRefreshing] = useState(false);
+
   const [contagemEsgotados, setContagemEsgotados] = useState(0);
+  const [contagemPedidos, setContagemPedidos] = useState(0); 
   const [loadingContagem, setLoadingContagem] = useState(true);
 
-  // Função para buscar a contagem de produtos esgotados
+  // Buscar contagem de produtos esgotados
   const fetchContagemEsgotados = async () => {
     try {
       setLoadingContagem(true);
+
       const response = await fetch(`${apiUrl}/api/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos');
       
       const data = await response.json();
       const esgotados = data.filter((p: any) => p.estoque === 0);
+
       setContagemEsgotados(esgotados.length);
     } catch (error) {
       console.error('Erro ao buscar contagem de esgotados:', error);
@@ -41,18 +47,25 @@ export default function HomeScreen() {
     }
   };
 
-  // Função para recarregar tudo
+  // Buscar contagem de pedidos (local)
+  const fetchContagemPedidos = () => {
+    setContagemPedidos(pedidos.length);
+  };
+
+  // Refresh geral
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchContagemEsgotados();
+    fetchContagemPedidos();
     setRefreshing(false);
   };
 
   useEffect(() => {
     fetchContagemEsgotados();
+    fetchContagemPedidos(); 
   }, []);
 
-  // Array das funcionalidades
+  // Funcionalidades da Home
   const funcionalidades = [
     {
       id: 1,
@@ -74,6 +87,7 @@ export default function HomeScreen() {
       icon: 'inventory',
       rota: '/pedidos',
       color: '#8A1B58',
+      badge: contagemPedidos > 0 ? contagemPedidos : null, 
     },
     {
       id: 4,
@@ -106,7 +120,6 @@ export default function HomeScreen() {
         <View style={styles.content}>
           <Text style={styles.sectionTitle}>Funcionalidades</Text>
           
-          {/* Container das funcionalidades em linha */}
           <View style={styles.funcionalidadesContainer}>
             {funcionalidades.map((item) => (
               <TouchableOpacity
@@ -127,7 +140,7 @@ export default function HomeScreen() {
                 {/* Nome */}
                 <Text style={styles.funcionalidadeText}>{item.nome}</Text>
                 
-                {/* Badge para Esgotados */}
+                {/* Badge */}
                 {item.badge && (
                   <View style={styles.badgeContainer}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
@@ -137,7 +150,6 @@ export default function HomeScreen() {
             ))}
           </View>
 
-          {/* Seção de Produtos */}
           <ProdutosList />
         </View>
       </ScrollView>

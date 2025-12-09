@@ -2,26 +2,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
+import { 
   ActivityIndicator,
   Alert,
-  Image,
+  Dimensions,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View 
 } from "react-native";
 
+const { width, height } = Dimensions.get('window');
 const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
 
-export default function Login() {
+export default function LoginScreen() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  // Estados de email, senha e carregamento
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Função de login via email e senha
   async function loginEmailSenha() {
     if (!email || !senha) {
       return Alert.alert("Erro", "Preencha email e senha.");
@@ -57,77 +60,51 @@ export default function Login() {
     }
   }
 
-  // async function loginGoogle() {
-  //   try {
-  //     const authRequest = new GoogleAuthProvider();
-  //     const result = await signInWithPopup(auth, authRequest);
-  //
-  //     const userData = {
-  //       nome: result.user.displayName,
-  //       email: result.user.email,
-  //       foto: result.user.photoURL,
-  //     };
-  //
-  //     await AsyncStorage.setItem("@user", JSON.stringify(userData));
-  //
-  //     router.replace("/home");
-  //   } catch (error) {
-  //     console.log(error);
-  //     Alert.alert("Erro", "Não foi possível fazer login com Google.");
-  //   }
-  // }
-
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../assets/images/logo.png")}
-        style={styles.logo}
-      />
+      {/* Parte superior com círculo */}
+      <View style={styles.topCircle} />
 
-      <Text style={styles.titulo}>Bem-vindo</Text>
+      {/* Parte inferior vinho com formulário */}
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          placeholderTextColor="#BEBEBE"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        placeholder="Email"
-        placeholderTextColor="#999"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#BEBEBE"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+        />
 
-      <TextInput
-        placeholder="Senha"
-        placeholderTextColor="#999"
-        style={styles.input}
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-      />
+        <TouchableOpacity 
+          style={styles.loginButton} 
+          onPress={loginEmailSenha}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#8A1B58" />
+          ) : (
+            <Text style={styles.loginButtonText}>Entrar</Text>
+          )}
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.botao}
-        onPress={loginEmailSenha}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" />
-        ) : (
-          <Text style={styles.botaoTexto}>Entrar</Text>
-        )}
-      </TouchableOpacity>
-
-      {/* BOTÃO GOOGLE (deixado exatamente como estava) */}
-
-      {/* 
-      <TouchableOpacity style={styles.googleBotao} onPress={loginGoogle}>
-        <Image source={require("../../assets/images/google.png")} style={styles.googleIcon} />
-        <Text style={styles.googleTexto}>Entrar com Google</Text>
-      </TouchableOpacity>
-      */}
-
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.link}>Criar conta</Text>
-      </TouchableOpacity>
+        {/* BOTÃO DE CRIAÇÃO DE CONTA (comentado) */}
+        {/*
+        <TouchableOpacity onPress={() => router.push("/register")}>
+          <Text style={styles.link}>Criar conta</Text>
+        </TouchableOpacity>
+        */}
+      </View>
     </View>
   );
 }
@@ -135,70 +112,47 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
+    backgroundColor: '#fff',
+    alignItems: 'center'
   },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
-    resizeMode: "contain",
+  topCircle: {
+    width: width * 0.7,
+    height: width * 0.7,
+    borderRadius: (width * 0.7) / 2,
+    backgroundColor: '#8A1B58',
+    marginTop: height * 0.08,
   },
-  titulo: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
+  formContainer: {
+    backgroundColor: '#8A1B58',
+    width: '100%',
+    flex: 1,
+    borderTopLeftRadius: width * 0.25,
+    borderTopRightRadius: width * 0.25,
+    paddingTop: height * 0.06,
+    paddingHorizontal: width * 0.12,
+    marginTop: height * 0.08,
   },
   input: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#f2f2f2",
-    borderRadius: 8,
-    paddingLeft: 12,
-    marginBottom: 15,
-    fontSize: 16,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: height * 0.02,
+    marginBottom: height * 0.03,
+    fontSize: width * 0.04
   },
-  botao: {
-    width: "100%",
-    height: 48,
-    backgroundColor: "#000",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
+  loginButton: {
+    backgroundColor: '#E2B24D',
+    padding: height * 0.02,
+    borderRadius: 10,
+    alignItems: 'center'
   },
-  botaoTexto: {
-    color: "#fff",
-    fontSize: 17,
-    fontWeight: "600",
+  loginButtonText: {
+    fontWeight: 'bold',
+    fontSize: width * 0.05,
+    color: '#8A1B58'
   },
   link: {
     marginTop: 10,
     color: "#007bff",
     fontSize: 15,
-  },
-  googleBotao: {
-    width: "100%",
-    height: 48,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 25,
-    backgroundColor: "#fff",
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-  },
-  googleTexto: {
-    fontSize: 16,
-    color: "#555",
   },
 });

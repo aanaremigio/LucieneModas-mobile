@@ -80,6 +80,9 @@ export default function Menu({ isOpen, onClose }: MenuProps) {
 
         {showCategorias && (
           <>
+          <TouchableOpacity onPress={() => navigate('/roupa')}>
+            <Text style={styles.link}>Roupas</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => navigate('/masculino')}>
             <Text style={styles.link}>Masculino</Text>
           </TouchableOpacity>

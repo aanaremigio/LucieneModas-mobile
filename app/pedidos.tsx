@@ -13,7 +13,6 @@ import Footer from "../components/footer";
 import Header from "../components/header";
 import { pedidos } from "../dados/pedidosDados";
 
-// Badge de status
 const getStatusStyle = (status: string) => ({
   backgroundColor: status === "Enviado" ? "#F5B600" : "#8A1B58",
   paddingVertical: 3,
@@ -32,6 +31,18 @@ export default function PedidosScreen() {
 
       <View style={styles.container}>
         <Text style={styles.title}>Pedidos</Text>
+        <View style={styles.contadorContainer}>
+          <View style={styles.contadorInfo}>
+            <MaterialCommunityIcons
+              name="clipboard-list"
+              size={24}
+              color="#8A1B58"
+            />
+            <Text style={styles.contadorText}>
+              {pedidos.length} pedido{pedidos.length !== 1 ? "s" : ""}
+            </Text>
+          </View>
+        </View>
 
         <FlatList
           data={pedidos}
@@ -93,6 +104,28 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: "#000",
   },
+  contadorContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    backgroundColor: "#F5ECD8",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#E2D3A4",
+  },
+  contadorInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  contadorText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#8A1B58",
+  },
+
   pedidoCard: {
     flexDirection: "row",
     backgroundColor: "#F5ECD8",

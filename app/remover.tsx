@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   trashButton: {
     position: 'absolute',
     right: 20,
-    top: 40,
+    top: 60,
     zIndex: 10,
   },
   trashButtonDisabled: {
