@@ -1,30 +1,33 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { 
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  StyleSheet,
+import {
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View 
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get('window');
 const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+const { width, height } = Dimensions.get("window");
 
-export default function LoginScreen() {
+export default function Login() {
   const router = useRouter();
 
-  // Estados de email, senha e carregamento
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false); 
 
-  // Função de login via email e senha
   async function loginEmailSenha() {
     if (!email || !senha) {
       return Alert.alert("Erro", "Preencha email e senha.");
@@ -46,12 +49,10 @@ export default function LoginScreen() {
         return Alert.alert("Erro", data.mensagem || "Credenciais inválidas.");
       }
 
-      // SALVAR USUÁRIO LOCALMENTE
       await AsyncStorage.setItem("@user", JSON.stringify(data.usuario));
 
       setLoading(false);
 
-      // REDIRECIONAR APÓS LOGIN
       router.replace("/home");
     } catch (error) {
       console.log("Erro ao autenticar:", error);
@@ -60,71 +61,111 @@ export default function LoginScreen() {
     }
   }
 
+  // async function loginGoogle() {
+  //   try {
+  //     const authRequest = new GoogleAuthProvider();
+  //     const result = await signInWithPopup(auth, authRequest);
+  //
+  //     const userData = {
+  //       nome: result.user.displayName,
+  //       email: result.user.email,
+  //       foto: result.user.photoURL,
+  //     };
+  //
+  //     await AsyncStorage.setItem("@user", JSON.stringify(userData));
+  //
+  //     router.replace("/home");
+  //   } catch (error) {
+  //     console.log(error);
+  //     Alert.alert("Erro", "Não foi possível fazer login com Google.");
+  //   }
+  // }
+
   return (
-    <View style={styles.container}>
-      {/* Parte superior com círculo */}
-      <View style={styles.topCircle} />
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.topCircle} />
+          <View style={styles.formContainer}>
 
-      {/* Parte inferior vinho com formulário */}
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#BEBEBE"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-        />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#BEBEBE"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#BEBEBE"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-        />
+            <View style={styles.senhaContainer}>
+              <TextInput
+                placeholder="Senha"
+                placeholderTextColor="#BEBEBE"
+                style={[styles.input, { flex: 1 }]}
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry={!mostrarSenha}
+              />
+              <TouchableOpacity
+                onPress={() => setMostrarSenha(!mostrarSenha)}
+                style={styles.iconeOlho}
+              >
+                <Ionicons
+                  name={mostrarSenha ? "eye" : "eye-off"}
+                  size={24}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
 
-        <TouchableOpacity 
-          style={styles.loginButton} 
-          onPress={loginEmailSenha}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#8A1B58" />
-          ) : (
-            <Text style={styles.loginButtonText}>Entrar</Text>
-          )}
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={loginEmailSenha}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#8A1B58" />
+              ) : (
+                <Text style={styles.loginButtonText}>Entrar</Text>
+              )}
+            </TouchableOpacity>
 
-        {/* BOTÃO DE CRIAÇÃO DE CONTA (comentado) */}
-        {/*
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={styles.link}>Criar conta</Text>
-        </TouchableOpacity>
-        */}
-      </View>
-    </View>
+            {/* 
+            <TouchableOpacity style={styles.googleBotao} onPress={loginGoogle}>
+              <Image source={require("../../assets/images/google.png")} style={styles.googleIcon} />
+              <Text style={styles.googleTexto}>Entrar com Google</Text>
+            </TouchableOpacity>
+            */}
+
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center'
+    backgroundColor: "#fff",
+    alignItems: "center",
   },
+
   topCircle: {
     width: width * 0.7,
     height: width * 0.7,
     borderRadius: (width * 0.7) / 2,
-    backgroundColor: '#8A1B58',
+    backgroundColor: "#8A1B58",
     marginTop: height * 0.08,
   },
+
   formContainer: {
-    backgroundColor: '#8A1B58',
-    width: '100%',
+    backgroundColor: "#8A1B58",
+    width: "100%",
     flex: 1,
     borderTopLeftRadius: width * 0.25,
     borderTopRightRadius: width * 0.25,
@@ -132,27 +173,66 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.12,
     marginTop: height * 0.08,
   },
+
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: height * 0.02,
     marginBottom: height * 0.03,
-    fontSize: width * 0.04
+    fontSize: width * 0.04,
   },
+
+  senhaContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  iconeOlho: {
+    position: "absolute",
+    right: 10,
+  },
+
   loginButton: {
-    backgroundColor: '#E2B24D',
+    backgroundColor: "#E2B24D",
     padding: height * 0.02,
     borderRadius: 10,
-    alignItems: 'center'
+    alignItems: "center",
   },
+
   loginButtonText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: width * 0.05,
-    color: '#8A1B58'
+    color: "#8A1B58",
   },
+
+  googleBotao: {
+    width: "100%",
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 25,
+    backgroundColor: "#fff",
+  },
+
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+
+  googleTexto: {
+    fontSize: 16,
+    color: "#555",
+  },
+
   link: {
-    marginTop: 10,
-    color: "#007bff",
-    fontSize: 15,
+    marginTop: 20,
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
   },
 });

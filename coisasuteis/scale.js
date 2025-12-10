@@ -11,3 +11,4 @@ export const moderateScale = (size, factor = 0.5) =>
   size + (scale(size) - size) * factor;
 
 export const fontScale = (size) => size * PixelRatio.getFontScale();
+

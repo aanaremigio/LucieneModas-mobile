@@ -35,6 +35,7 @@ function normalizar(str: string) {
 }
 
 export default function ProdutosForm() {
+  // Configuração da URL da API
   const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
 
   const params = useLocalSearchParams();
@@ -70,7 +71,8 @@ export default function ProdutosForm() {
     try {
       setLoadingInicial(true);
       const id = getParamString(params.id);
-      
+
+      // Operação GET para carregar dados (edição)
       const response = await fetch(`${apiUrl}/api/produtos/${id}`);
       if (!response.ok) throw new Error("Erro ao carregar produto");
       
@@ -144,6 +146,7 @@ export default function ProdutosForm() {
           type: "image/jpeg",
         } as any);
 
+        // Operação POST para upload de imagem com multipart/form-data
         const uploadRes = await fetch(
           `${apiUrl}/api/upload`,
           {
@@ -167,11 +170,11 @@ export default function ProdutosForm() {
         estoque: form.estoque ? parseInt(form.estoque) : 0,
         imagemUrl,
       };
-
+      // Determinação dinâmica do método HTTP
       const url = isEdit
         ? `${apiUrl}/api/produtos/${params.id}`
         : `${apiUrl}/api/produtos`;
-
+      // Operação principal (POST ou PUT)
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
