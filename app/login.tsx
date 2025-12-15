@@ -1,20 +1,24 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  StyleSheet,
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get("window");
 const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
+const { width, height } = Dimensions.get("window");
 
 export default function Login() {
   const router = useRouter();
@@ -22,7 +26,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false); 
 
   async function loginEmailSenha() {
     if (!email || !senha) {
@@ -51,23 +55,11 @@ export default function Login() {
         return Alert.alert("Erro", data.mensagem || "Credenciais inválidas.");
       }
 
-      // SALVAR USUÁRIO LOCALMENTE
-      await AsyncStorage.setItem(
-        "@user",
-        JSON.stringify({
-          id: data?.usuario?.id ?? null,
-          nome: data?.usuario?.nome ?? null,
-          email: data?.usuario?.email ?? email,
-          token: data?.token ?? null,
-        })
-      );
+      await AsyncStorage.setItem("@user", JSON.stringify(data.usuario));
 
       setLoading(false);
 
-      // REDIRECIONAR COM SEGURANÇA
-      setTimeout(() => {
-        router.replace("/home");
-      }, 150);
+      router.replace("/home");
     } catch (error) {
       console.log("Erro ao autenticar:", error);
       setLoading(false);
@@ -96,68 +88,69 @@ export default function Login() {
   // }
 
   return (
-    <View style={styles.container}>
-      {/* Círculo superior */}
-      <View style={styles.topCircle} />
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#fff" }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.topCircle} />
+          <View style={styles.formContainer}>
 
-      {/* Área inferior do formulário */}
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor="#BEBEBE"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#BEBEBE"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
 
-        {/* CAMPO DE SENHA COM BOTÃO DE MOSTRAR/OCULTAR */}
-        <View style={styles.passwordContainer}>
-          <TextInput
-            style={[styles.input, { flex: 1 }]}
-            placeholder="Senha"
-            placeholderTextColor="#BEBEBE"
-            secureTextEntry={!showPassword}
-            value={senha}
-            onChangeText={setSenha}
-          />
+            <View style={styles.senhaContainer}>
+              <TextInput
+                placeholder="Senha"
+                placeholderTextColor="#BEBEBE"
+                style={[styles.input, { flex: 1 }]}
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry={!mostrarSenha}
+              />
+              <TouchableOpacity
+                onPress={() => setMostrarSenha(!mostrarSenha)}
+                style={styles.iconeOlho}
+              >
+                <Ionicons
+                  name={mostrarSenha ? "eye" : "eye-off"}
+                  size={24}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
 
-          <TouchableOpacity
-            style={styles.eyeButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Text style={styles.eyeButtonText}>
-              {showPassword ? "🙈" : "👁️"}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={loginEmailSenha}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#8A1B58" />
+              ) : (
+                <Text style={styles.loginButtonText}>Entrar</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* 
+            <TouchableOpacity style={styles.googleBotao} onPress={loginGoogle}>
+              <Image source={require("../../assets/images/google.png")} style={styles.googleIcon} />
+              <Text style={styles.googleTexto}>Entrar com Google</Text>
+            </TouchableOpacity>
+            */}
+
+          </View>
         </View>
-
-        <TouchableOpacity
-          style={styles.loginButton}
-          disabled={loading}
-          onPress={loginEmailSenha}
-        >
-          {loading ? (
-            <ActivityIndicator color="#8A1B58" />
-          ) : (
-            <Text style={styles.loginButtonText}>Entrar</Text>
-          )}
-        </TouchableOpacity>
-
-        {/*<TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.link}>Criar conta</Text>
-        </TouchableOpacity>*/}
-
-        {/* BOTÃO GOOGLE (mantido como estava) */}
-        {/* 
-        <TouchableOpacity style={styles.googleBotao} onPress={loginGoogle}>
-          <Image source={require("../../assets/images/google.png")} style={styles.googleIcon} />
-          <Text style={styles.googleTexto}>Entrar com Google</Text>
-        </TouchableOpacity>
-        */}
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -195,23 +188,14 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
   },
 
-  passwordContainer: {
+  senhaContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingRight: 10,
-    marginBottom: height * 0.03,
   },
 
-  eyeButton: {
-    padding: 6,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  eyeButtonText: {
-    fontSize: 22,
+  iconeOlho: {
+    position: "absolute",
+    right: 10,
   },
 
   loginButton: {
@@ -227,14 +211,6 @@ const styles = StyleSheet.create({
     color: "#8A1B58",
   },
 
-  link: {
-    marginTop: 15,
-    textAlign: "center",
-    fontSize: width * 0.038,
-    color: "#E2B24D",
-    fontWeight: "bold",
-  },
-
   googleBotao: {
     width: "100%",
     height: 48,
@@ -244,7 +220,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30,
+    marginBottom: 25,
     backgroundColor: "#fff",
   },
 
@@ -258,4 +234,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
   },
+
+  link: {
+    marginTop: 20,
+    color: "#fff",
+    fontSize: 16,
+    textAlign: "center",
+  },
+
+  // googleBotao: {
+  //   width: "100%",
+  //   height: 48,
+  //   borderWidth: 1,
+  //   borderColor: "#ccc",
+  //   borderRadius: 8,
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   marginTop: 30,
+  //   backgroundColor: "#fff",
+  // },
+
+  // googleIcon: {
+  //   width: 24,
+  //   height: 24,
+  //   marginRight: 10,
+  // },
+
+  // googleTexto: {
+  //   fontSize: 16,
+  //   color: "#555",
+  // },
 });

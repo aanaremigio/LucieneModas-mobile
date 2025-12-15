@@ -30,6 +30,7 @@ export default function RemoverScreen() {
   const fetchProdutos = async () => {
     try {
       setLoading(true);
+      // Operação GET para listagem
       const response = await fetch(`${apiUrl}/api/produtos`);
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const data = await response.json();
@@ -63,6 +64,7 @@ export default function RemoverScreen() {
       setDeleting(true);
       
       for (const item of selectedItems) {
+        // Operação DELETE em lote
         const response = await fetch(`${apiUrl}/api/produtos/${item.id}`, {
           method: "DELETE",
           body: JSON.stringify({ url: item.imagem }),

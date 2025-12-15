@@ -61,7 +61,6 @@ export default function ProdutosList() {
                 style={styles.productImage}
                 resizeMode="cover"
               />
-              {/* Ícone de exclamação se estoque = 0 */}
               {p.estoque === 0 && (
                 <View style={styles.warningIcon}>
                   <MaterialIcons name="error" size={22} color="#F5B600" />

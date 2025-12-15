@@ -27,7 +27,7 @@ export default function AberturaScreen() {
 
     const timer = setTimeout(() => {
       // router.replace('/login');
-      router.replace("/login");
+      router.replace("/home");
     }, 5000);
 
     return () => clearTimeout(timer);

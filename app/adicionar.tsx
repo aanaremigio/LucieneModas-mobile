@@ -35,6 +35,7 @@ function normalizar(str: string) {
 }
 
 export default function ProdutosForm() {
+  // Configuração da URL da API
   const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
 
   const params = useLocalSearchParams();
@@ -70,7 +71,8 @@ export default function ProdutosForm() {
     try {
       setLoadingInicial(true);
       const id = getParamString(params.id);
-      
+
+      // Operação GET para carregar dados (edição)
       const response = await fetch(`${apiUrl}/api/produtos/${id}`);
       if (!response.ok) throw new Error("Erro ao carregar produto");
       
@@ -117,7 +119,7 @@ export default function ProdutosForm() {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: "images",
       quality: 1,
     });
 
@@ -144,6 +146,7 @@ export default function ProdutosForm() {
           type: "image/jpeg",
         } as any);
 
+        // Operação POST para upload de imagem com multipart/form-data
         const uploadRes = await fetch(
           `${apiUrl}/api/upload`,
           {
@@ -167,11 +170,11 @@ export default function ProdutosForm() {
         estoque: form.estoque ? parseInt(form.estoque) : 0,
         imagemUrl,
       };
-
+      // Determinação dinâmica do método HTTP
       const url = isEdit
         ? `${apiUrl}/api/produtos/${params.id}`
         : `${apiUrl}/api/produtos`;
-
+      // Operação principal (POST ou PUT)
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -208,7 +211,7 @@ export default function ProdutosForm() {
     }
   };
 
-  // Loader inicial
+  // Se estiver carregando dados iniciais (edição)
   if (loadingInicial) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -228,13 +231,10 @@ export default function ProdutosForm() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} // ajuste conforme altura do Header
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={100}
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
 
           <TouchableOpacity 
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     width: '90%',
-    minHeight: 100,
+    height: 100,
     backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
