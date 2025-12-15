@@ -145,9 +145,9 @@ export default function Login() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={styles.link}>Criar conta</Text>
-        </TouchableOpacity>
+        {/*<TouchableOpacity onPress={() => router.push("/register")}>
+        <Text style={styles.link}>Criar conta</Text>
+        </TouchableOpacity>*/}
 
         {/* BOTÃO GOOGLE (mantido como estava) */}
         {/* 
