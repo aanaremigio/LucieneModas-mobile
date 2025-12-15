@@ -117,7 +117,7 @@ export default function ProdutosForm() {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
@@ -208,7 +208,7 @@ export default function ProdutosForm() {
     }
   };
 
-  // Se estiver carregando dados iniciais (edição)
+  // Loader inicial
   if (loadingInicial) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
@@ -228,10 +228,13 @@ export default function ProdutosForm() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={100}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} // ajuste conforme altura do Header
       >
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
 
           <TouchableOpacity 
@@ -429,7 +432,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     width: '90%',
-    height: 100,
+    minHeight: 100,
     backgroundColor: '#EFDDBB',
     borderRadius: 8,
     padding: 10,
