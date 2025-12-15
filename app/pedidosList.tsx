@@ -8,6 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Footer from "../components/footer";
 import Header from "../components/header";
@@ -36,100 +38,114 @@ export default function PedidoListScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.pedidoCard}>
-          {/* Nome e e-mail */}
-          <Text style={styles.nome}>@{pedido.nome}</Text>
-          <Text style={styles.email}>{pedido.email}</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.pedidoCard}>
+            {/* Nome e e-mail */}
+            <Text style={styles.nome}>@{pedido.nome}</Text>
+            <Text style={styles.email}>{pedido.email}</Text>
 
-          {/* Itens */}
-          <View style={styles.itensRow}>
-            {pedido.itens.map((item, index) => (
-              <View key={index} style={styles.itemBox}>
-                <View style={styles.itemImagem} />
-                <Text style={styles.itemNome}>{item.nome}</Text>
-                <Text style={styles.itemPreco}>
-                  R$ {item.preco.toFixed(2).replace(".", ",")}
-                </Text>
-              </View>
-            ))}
-          </View>
+            {/* Itens */}
+            <View style={styles.itensRow}>
+              {pedido.itens.map((item, index) => (
+                <View key={index} style={styles.itemBox}>
+                  <View style={styles.itemImagem} />
+                  <Text style={styles.itemNome}>{item.nome}</Text>
+                  <Text style={styles.itemPreco}>
+                    R$ {item.preco.toFixed(2).replace(".", ",")}
+                  </Text>
+                </View>
+              ))}
+            </View>
 
-          {/* Pedido */}
-          <Text style={styles.numeroPedido}>Pedido #{pedido.numero}</Text>
+            {/* Pedido */}
+            <Text style={styles.numeroPedido}>Pedido #{pedido.numero}</Text>
 
-          {/* Status */}
-          <View
-            style={[
-              styles.statusBadge,
-              statusEnviado ? styles.statusEnviado : styles.statusPendente,
-            ]}
-          >
-            <Text style={styles.statusText}>
-              {statusEnviado ? "Enviado" : "Em espera"}
-            </Text>
-          </View>
-
-          {/* Data e Total */}
-          <View style={styles.detailsRow}>
-            <Text style={styles.info}>Data: {pedido.data}</Text>
-            <Text style={styles.info}>
-              Total: R$ {pedido.valorTotal.toFixed(2).replace(".", ",")}
-            </Text>
-          </View>
-
-          {/* Botão Atualizar */}
-          <TouchableOpacity
-            style={styles.botaoAtualizar}
-            onPress={() => setStatusEnviado((prev) => !prev)}
-          >
-            <Text style={styles.textoBotao}>
-              Atualizar para {statusEnviado ? "espera" : "enviado"}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Endereço */}
-          <View style={styles.endereco}>
-            <Text style={styles.enderecoTitulo}>Endereço:</Text>
-            <Text style={styles.enderecoValor}>{pedido.endereco.cep}</Text>
-            <Text style={styles.enderecoValor}>{pedido.endereco.rua}</Text>
-            <Text style={styles.enderecoValor}>{pedido.endereco.numero}</Text>
-            <Text style={styles.enderecoValor}>{pedido.endereco.bairro}</Text>
-          </View>
-
-          {/* Confirmação */}
-          <View style={styles.confirmacao}>
-            <Text style={styles.confirmacaoTitulo}>
-              Enviar confirmação por E-mail:
-            </Text>
-            <TextInput
-              style={styles.input}
-              value={pedido.email}
-              editable={false}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Digite o código de rastreio"
-              value={codigoRastreio}
-              onChangeText={setCodigoRastreio}
-            />
-
-            <View style={styles.mensagemBox}>
-              <Text style={styles.mensagemTexto}>
-                Olá, Seu pedido foi enviado com sucesso! 🚚{"\n"}
-                Código de rastreio: {codigoRastreio || "EX123456789BR"}
-                {"\n"}
-                Acompanhe em: https://www.correios.com.br/rastreamento{"\n\n"}
-                Agradecemos pela sua compra!{"\n"}- Equipe Luciene Modas
+            {/* Status */}
+            <View
+              style={[
+                styles.statusBadge,
+                statusEnviado ? styles.statusEnviado : styles.statusPendente,
+              ]}
+            >
+              <Text style={styles.statusText}>
+                {statusEnviado ? "Enviado" : "Em espera"}
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.botaoEnviar}>
-              <Text style={styles.textoBotaoEnviar}>Enviar confirmação</Text>
+            {/* Data e Total */}
+            <View style={styles.detailsRow}>
+              <Text style={styles.info}>Data: {pedido.data}</Text>
+              <Text style={styles.info}>
+                Total: R$ {pedido.valorTotal.toFixed(2).replace(".", ",")}
+              </Text>
+            </View>
+
+            {/* Botão Atualizar */}
+            <TouchableOpacity
+              style={styles.botaoAtualizar}
+              onPress={() => setStatusEnviado((prev) => !prev)}
+            >
+              <Text style={styles.textoBotao}>
+                Atualizar para {statusEnviado ? "espera" : "enviado"}
+              </Text>
             </TouchableOpacity>
+
+            {/* Endereço */}
+            <View style={styles.endereco}>
+              <Text style={styles.enderecoTitulo}>Endereço:</Text>
+              <Text style={styles.enderecoValor}>{pedido.endereco.cep}</Text>
+              <Text style={styles.enderecoValor}>{pedido.endereco.rua}</Text>
+              <Text style={styles.enderecoValor}>{pedido.endereco.numero}</Text>
+              <Text style={styles.enderecoValor}>{pedido.endereco.bairro}</Text>
+            </View>
+
+            {/* Confirmação */}
+            <View style={styles.confirmacao}>
+              <Text style={styles.confirmacaoTitulo}>
+                Enviar confirmação por E-mail:
+              </Text>
+
+              <TextInput
+                style={styles.input}
+                value={pedido.email}
+                editable={false}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Digite o código de rastreio"
+                value={codigoRastreio}
+                onChangeText={setCodigoRastreio}
+              />
+
+              <View style={styles.mensagemBox}>
+                <Text style={styles.mensagemTexto}>
+                  Olá, Seu pedido foi enviado com sucesso! 🚚{"\n"}
+                  Código de rastreio: {codigoRastreio || "EX123456789BR"}
+                  {"\n"}
+                  Acompanhe em: https://www.correios.com.br/rastreamento{"\n\n"}
+                  Agradecemos pela sua compra!{"\n"}- Equipe Luciene Modas
+                </Text>
+              </View>
+
+              <TouchableOpacity style={styles.botaoEnviar}>
+                <Text style={styles.textoBotaoEnviar}>
+                  Enviar confirmação
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <Footer />
     </SafeAreaView>
@@ -139,7 +155,7 @@ export default function PedidoListScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   pedidoCard: {
     backgroundColor: "#F5ECD8",

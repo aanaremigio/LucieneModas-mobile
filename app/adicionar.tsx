@@ -147,14 +147,11 @@ export default function ProdutosForm() {
         } as any);
 
         // Operação POST para upload de imagem com multipart/form-data
-        const uploadRes = await fetch(
-          `${apiUrl}/api/upload`,
-          {
-            method: "POST",
-            body: formData,
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+        const uploadRes = await fetch(`${apiUrl}/api/upload`, {
+          method: "POST",
+          body: formData,
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
         if (!uploadRes.ok) throw new Error("Erro ao enviar imagem");
         const data = await uploadRes.json();
@@ -170,10 +167,12 @@ export default function ProdutosForm() {
         estoque: form.estoque ? parseInt(form.estoque) : 0,
         imagemUrl,
       };
+
       // Determinação dinâmica do método HTTP
       const url = isEdit
         ? `${apiUrl}/api/produtos/${params.id}`
         : `${apiUrl}/api/produtos`;
+
       // Operação principal (POST ou PUT)
       const method = isEdit ? "PUT" : "POST";
 
@@ -231,11 +230,17 @@ export default function ProdutosForm() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={100}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
       >
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>{isEdit ? "Editar Produto" : "Adicionar Produto"}</Text>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>
+            {isEdit ? "Editar Produto" : "Adicionar Produto"}
+          </Text>
 
           <TouchableOpacity 
             style={styles.imageBox} 
@@ -349,7 +354,9 @@ export default function ProdutosForm() {
             {loading ? (
               <ActivityIndicator size="small" color="#8A1B58" />
             ) : (
-              <Text style={styles.salvarText}>{isEdit ? "Atualizar" : "Salvar"}</Text>
+              <Text style={styles.salvarText}>
+                {isEdit ? "Atualizar" : "Salvar"}
+              </Text>
             )}
           </TouchableOpacity>
         </ScrollView>
@@ -364,7 +371,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingBottom: 100,
+    paddingBottom: 120,
     backgroundColor: '#fff',
   },
   title: {

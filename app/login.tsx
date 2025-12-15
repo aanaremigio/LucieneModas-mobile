@@ -49,7 +49,6 @@ export default function Login() {
       console.log("STATUS:", response.status);
       console.log("RESPOSTA DA API:", data);
 
-
       if (!response.ok) {
         setLoading(false);
         return Alert.alert("Erro", data.mensagem || "Credenciais inválidas.");
@@ -90,11 +89,17 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#fff" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <View style={styles.topCircle} />
+
           <View style={styles.formContainer}>
 
             <TextInput
@@ -105,6 +110,7 @@ export default function Login() {
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
+              returnKeyType="next"
             />
 
             <View style={styles.senhaContainer}>
@@ -115,6 +121,7 @@ export default function Login() {
                 value={senha}
                 onChangeText={setSenha}
                 secureTextEntry={!mostrarSenha}
+                returnKeyType="done"
               />
               <TouchableOpacity
                 onPress={() => setMostrarSenha(!mostrarSenha)}
