@@ -10,5 +10,9 @@ export default {
       apiUrl: process.env.API_URL,
       ambiente: process.env.AMBIENTE,
     },
+    
+  plugins: [
+    "expo-router"
+  ]
   },
 };

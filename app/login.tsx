@@ -1,21 +1,21 @@
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
   ActivityIndicator,
+  Alert,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
-import { Ionicons } from "@expo/vector-icons";
 
 const { apiUrl }: any = Constants.expoConfig?.extra ?? {};
 const { width, height } = Dimensions.get("window");
@@ -36,9 +36,9 @@ export default function Login() {
     setLoading(true);
 
     try {
+      console.log(`${apiUrl}/api/login`);
       const response = await fetch(`${apiUrl}/api/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           senha,
